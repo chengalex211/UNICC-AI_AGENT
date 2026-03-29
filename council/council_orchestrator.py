@@ -81,7 +81,7 @@ REQUIRED_HANDOFF_FIELDS = [
 
 def run_expert1(
     submission: AgentSubmission,
-    backend:    str = "claude",
+    backend:    str = "vllm",
     vllm_client=None,
 ) -> dict:
     """
@@ -123,7 +123,7 @@ def run_expert1(
 
 def run_expert2(
     submission: AgentSubmission,
-    backend:    str = "claude",
+    backend:    str = "vllm",
     vllm_client=None,
 ) -> dict:
     """
@@ -145,7 +145,7 @@ def run_expert2(
 
 def run_expert3(
     submission: AgentSubmission,
-    backend:    str = "claude",
+    backend:    str = "vllm",
     vllm_client=None,
 ) -> dict:
     """
@@ -381,14 +381,14 @@ class CouncilOrchestrator:
     Main orchestrator for the Council of Experts.
 
     Usage:
-        orchestrator = CouncilOrchestrator(backend="claude")
+        orchestrator = CouncilOrchestrator(backend="vllm")
         report = orchestrator.evaluate(submission)
         print(report.to_json())
     """
 
     def __init__(
         self,
-        backend:     str  = "claude",
+        backend:     str  = "vllm",
         client:      Optional[anthropic.Anthropic] = None,
         vllm_base_url: str  = "http://localhost:8000",
         vllm_model:    str  = "meta-llama/Meta-Llama-3-70B-Instruct",
@@ -675,7 +675,7 @@ def evaluate_agent(
     agent_id:           str,
     system_description: str,
     system_name:        str  = "",
-    backend:            str  = "claude",
+    backend:            str  = "vllm",
     vllm_base_url:      str  = "http://localhost:8000",
     vllm_model:         str  = "meta-llama/Meta-Llama-3-70B-Instruct",
 ) -> CouncilReport:

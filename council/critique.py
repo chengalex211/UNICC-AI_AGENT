@@ -383,7 +383,7 @@ Output the following JSON only (no extra text):
 
 def call_critique_llm(
     prompt:  str,
-    backend: str = "claude",
+    backend: str = "vllm",
     client:  Optional[anthropic.Anthropic] = None,
     vllm_client=None,
 ) -> dict:
@@ -466,7 +466,7 @@ def generate_one_critique(
     my_report:     dict,
     other_context: CritiqueContext,
     contexts:      dict,
-    backend:       str = "claude",
+    backend:       str = "vllm",
     client:        Optional[anthropic.Anthropic] = None,
     vllm_client=None,
 ) -> CritiqueResult:
@@ -511,7 +511,7 @@ def generate_one_critique(
 
 def run_critique_round(
     reports: dict,
-    backend: str = "claude",
+    backend: str = "vllm",
     client:  Optional[anthropic.Anthropic] = None,
     vllm_client=None,
 ) -> dict:

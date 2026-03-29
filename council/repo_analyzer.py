@@ -10,7 +10,7 @@ Usage (Python):
 
     description = analyze_repo(
         source  = "https://github.com/owner/repo",  # or "/path/to/local/dir"
-        backend = "claude",   # or "vllm"
+        backend = "vllm",     # or "claude" (fallback/test)
     )
     report = evaluate_agent(agent_id="my-sys", system_description=description)
 
@@ -265,7 +265,7 @@ Generate the structured system description now.
 def generate_system_description(
     files: dict[str, str],
     source_label: str = "unknown",
-    backend: str = "claude",
+    backend: str = "vllm",
     vllm_base_url: str = "http://localhost:8000",
     vllm_model: str = "meta-llama/Meta-Llama-3-70B-Instruct",
     anthropic_api_key: Optional[str] = None,
@@ -317,7 +317,7 @@ def generate_system_description(
 
 def analyze_repo(
     source: str,
-    backend: str = "claude",
+    backend: str = "vllm",
     vllm_base_url: str = "http://localhost:8000",
     vllm_model: str = "meta-llama/Meta-Llama-3-70B-Instruct",
     github_token: Optional[str] = None,

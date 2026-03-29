@@ -152,7 +152,7 @@ class CouncilEvaluateRequest(BaseModel):
     deployment_context: str = ""
     data_access: list[str] = Field(default_factory=list)
     risk_indicators: list[str] = Field(default_factory=list)
-    backend: str = Field("claude", description="claude|vllm")
+    backend: str = Field("vllm", description="claude|vllm")
     vllm_base_url: str = "http://localhost:8000"
     vllm_model: str = "meta-llama/Meta-Llama-3-70B-Instruct"
 
@@ -162,7 +162,7 @@ class RepoAnalyzeRequest(BaseModel):
         ...,
         description="GitHub URL (https://github.com/owner/repo) or absolute local path",
     )
-    backend: str = Field("claude", description="claude|vllm — LLM used to generate the description")
+    backend: str = Field("vllm", description="claude|vllm — LLM used to generate the description")
     vllm_base_url: str = "http://localhost:8000"
     vllm_model: str = "meta-llama/Meta-Llama-3-70B-Instruct"
     github_token: str = Field("", description="Optional GitHub PAT for private repos")

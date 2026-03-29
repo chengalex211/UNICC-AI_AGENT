@@ -20,7 +20,7 @@ const DEPLOY_ZONES = [
 
 const defaultCouncilBackend = (): 'claude' | 'vllm' => {
   const v = import.meta.env.VITE_COUNCIL_BACKEND
-  return v === 'vllm' ? 'vllm' : 'claude'
+  return v === 'claude' ? 'claude' : 'vllm'
 }
 
 const NewEvaluation: FC<Props> = ({ onSubmit }) => {
@@ -172,19 +172,7 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
                 <code className="text-[10px] bg-apple-gray-100 px-1 rounded">VITE_VLLM_MODEL</code>.
               </p>
               <div className="flex flex-col gap-3 mt-2">
-                <label className={`flex items-start gap-3 p-3 rounded-apple border-2 cursor-pointer transition-colors ${form.llm_backend === 'claude' ? 'border-apple-blue bg-apple-blue-light' : 'border-apple-gray-100 hover:border-apple-gray-200'}`}>
-                  <input
-                    type="radio"
-                    name="llm_backend"
-                    checked={form.llm_backend === 'claude'}
-                    onChange={() => { hapticSelect(); setForm(f => ({ ...f, llm_backend: 'claude' })) }}
-                    className="mt-1 w-4 h-4 text-apple-blue"
-                  />
-                  <div>
-                    <span className="text-sm font-semibold text-apple-gray-900">Claude (Anthropic API)</span>
-                    <p className="text-xs text-apple-gray-500 mt-0.5">Server needs ANTHROPIC_API_KEY. No vLLM required.</p>
-                  </div>
-                </label>
+                {/* vLLM — primary */}
                 <label className={`flex items-start gap-3 p-3 rounded-apple border-2 cursor-pointer transition-colors ${form.llm_backend === 'vllm' ? 'border-apple-blue bg-apple-blue-light' : 'border-apple-gray-100 hover:border-apple-gray-200'}`}>
                   <input
                     type="radio"
@@ -194,8 +182,11 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
                     className="mt-1 w-4 h-4 text-apple-blue"
                   />
                   <div className="min-w-0 flex-1">
-                    <span className="text-sm font-semibold text-apple-gray-900">vLLM / SLM (OpenAI-compatible)</span>
-                    <p className="text-xs text-apple-gray-500 mt-0.5 mb-3">Experts and critiques call your inference server. Ensure the URL is reachable from the machine running frontend_api.</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-apple-gray-900">vLLM / SLM</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wide bg-apple-blue text-white px-1.5 py-0.5 rounded">Primary</span>
+                    </div>
+                    <p className="text-xs text-apple-gray-500 mt-0.5 mb-3">OpenAI-compatible endpoint. All experts and critiques route through your inference server.</p>
                     {form.llm_backend === 'vllm' && (
                       <div className="space-y-3 pt-1">
                         <div>
@@ -218,6 +209,23 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
                         </div>
                       </div>
                     )}
+                  </div>
+                </label>
+                {/* Claude — fallback / testing */}
+                <label className={`flex items-start gap-3 p-3 rounded-apple border-2 cursor-pointer transition-colors ${form.llm_backend === 'claude' ? 'border-apple-blue bg-apple-blue-light' : 'border-apple-gray-100 hover:border-apple-gray-200'}`}>
+                  <input
+                    type="radio"
+                    name="llm_backend"
+                    checked={form.llm_backend === 'claude'}
+                    onChange={() => { hapticSelect(); setForm(f => ({ ...f, llm_backend: 'claude' })) }}
+                    className="mt-1 w-4 h-4 text-apple-blue"
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-apple-gray-900">Claude (Anthropic API)</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wide bg-apple-gray-300 text-apple-gray-600 px-1.5 py-0.5 rounded">Fallback / Test</span>
+                    </div>
+                    <p className="text-xs text-apple-gray-500 mt-0.5">Requires <code className="text-[10px] bg-apple-gray-100 px-1 rounded">ANTHROPIC_API_KEY</code> on the server. No local GPU needed.</p>
                   </div>
                 </label>
               </div>
