@@ -123,12 +123,23 @@ Orchestrator: `council/council_orchestrator.py`. Critique generation: `council/c
 
 ## Environment and backends
 
-| Variable / setting | Role |
-|--------------------|------|
-| `ANTHROPIC_API_KEY` | Claude for experts / critiques when `backend=claude` |
-| vLLM URL / model | When using `backend=vllm`; see OpenAPI and `slm_backends.py` |
+### Backend server (`frontend_api` / `council`)
 
-Do **not** commit `.env`. Root `.gitignore` covers `.env*`, `node_modules/`, `__pycache__/`, etc.
+| Variable | Role |
+|----------|------|
+| `ANTHROPIC_API_KEY` | Claude API key; required when `backend=claude` |
+| — | When using `backend=vllm`, pass `vllm_base_url` and `vllm_model` in the request body (or set defaults in `council_orchestrator`) |
+
+### Frontend (`real_frontend`) — copy `real_frontend/.env.example` to `real_frontend/.env.local`
+
+| Variable | Default | Role |
+|----------|---------|------|
+| `VITE_API_URL` | `http://localhost:8100` | `frontend_api` base URL |
+| `VITE_COUNCIL_BACKEND` | `claude` | Pre-select backend in the UI (`claude` or `vllm`) |
+| `VITE_VLLM_BASE_URL` | `http://127.0.0.1:8000` | vLLM inference server URL (UI default when vllm selected) |
+| `VITE_VLLM_MODEL` | `meta-llama/Meta-Llama-3-70B-Instruct` | Model name passed to vLLM |
+
+Do **not** commit `.env` / `.env.local`. Root `.gitignore` covers `.env*`, `node_modules/`, `__pycache__/`, etc. The `.env.example` files are intentionally tracked.
 
 ---
 

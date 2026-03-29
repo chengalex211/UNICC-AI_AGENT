@@ -152,8 +152,23 @@ The production app maps JSON to UI via `real_frontend/src/utils/mapCouncilReport
 
 ## 8. Configuration and safety
 
-- **Secrets**: environment variables (e.g. `ANTHROPIC_API_KEY`); never commit `.env`.
-- **`.gitignore`**: covers common secret files, `node_modules`, and local data patterns; large assets follow project policy.
+### Backend server
+
+| Variable | Role |
+|----------|------|
+| `ANTHROPIC_API_KEY` | Required for Claude backend (`backend=claude`) |
+| — | For vLLM: pass `vllm_base_url` and `vllm_model` in the request body |
+
+### Frontend (`real_frontend`) — copy `real_frontend/.env.example` → `real_frontend/.env.local`
+
+| Variable | Default | Role |
+|----------|---------|------|
+| `VITE_API_URL` | `http://localhost:8100` | Points the UI at the `frontend_api` server |
+| `VITE_COUNCIL_BACKEND` | `claude` | Pre-selects backend in the New Evaluation form (`claude` or `vllm`) |
+| `VITE_VLLM_BASE_URL` | `http://127.0.0.1:8000` | vLLM inference server URL |
+| `VITE_VLLM_MODEL` | `meta-llama/Meta-Llama-3-70B-Instruct` | Model name sent to vLLM |
+
+**Never commit `.env` / `.env.local`.** Root `.gitignore` covers `.env*`, `node_modules/`, `__pycache__/`, etc. The `.env.example` template files are intentionally tracked.
 
 ---
 
