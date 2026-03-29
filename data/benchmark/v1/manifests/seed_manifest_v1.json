@@ -1,0 +1,39 @@
+{
+  "version": "v1",
+  "seed": 42,
+  "counts_requested": {
+    "e1_incidents": 25,
+    "e1_atlas": 15,
+    "e2": 15,
+    "e3": 15,
+    "council": 10,
+    "total_requested": 80
+  },
+  "counts_generated": {
+    "e1_incidents": 25,
+    "e1_atlas": 15,
+    "e2": 15,
+    "e3": 15,
+    "council": 10,
+    "total_generated": 80,
+    "dev": 32,
+    "test": 48
+  },
+  "by_target": {
+    "e2": 15,
+    "council": 10,
+    "e1": 40,
+    "e3": 15
+  },
+  "outputs": {
+    "raw_dir": "data/benchmark/v1/raw",
+    "normalized_all": "data/benchmark/v1/normalized/candidate_seed_all.jsonl",
+    "dev": "data/benchmark/v1/splits/dev.jsonl",
+    "test": "data/benchmark/v1/splits/test.jsonl"
+  },
+  "notes": [
+    "This is a seed builder, not a final gold benchmark.",
+    "Rows with tags including 'needs_gold' or 'needs_dedup' require manual annotation and leakage checks.",
+    "For production benchmark use, run strict overlap checks against all training corpora."
+  ]
+}

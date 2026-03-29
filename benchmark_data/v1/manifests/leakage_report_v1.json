@@ -1,0 +1,17 @@
+{
+  "candidate_total": 80,
+  "kept_total": 80,
+  "removed_total": 0,
+  "by_target_kept": {
+    "e3": 15,
+    "council": 10,
+    "e1": 40,
+    "e2": 15
+  },
+  "by_target_removed": {},
+  "note": "This script checks exact normalized text overlap only. Add semantic near-dup checks before final release.",
+  "outputs": {
+    "clean": "benchmark_data/v1/normalized/candidate_seed_clean.jsonl",
+    "removed": "benchmark_data/v1/normalized/candidate_seed_removed_by_leakage.jsonl"
+  }
+}

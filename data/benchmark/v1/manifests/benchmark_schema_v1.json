@@ -1,0 +1,40 @@
+{
+  "schema_version": "v1",
+  "description": "Unified benchmark candidate schema for E1/E2/E3/Council.",
+  "required_fields": [
+    "sample_id",
+    "expert_target",
+    "source_type",
+    "source_path",
+    "input",
+    "provisional_gold",
+    "tags"
+  ],
+  "field_specs": {
+    "sample_id": "string, unique per row",
+    "expert_target": "string enum: e1|e2|e3|council",
+    "source_type": "string source classifier",
+    "source_path": "relative path to upstream source",
+    "input": {
+      "agent_id": "string",
+      "system_name": "string",
+      "system_description": "string"
+    },
+    "provisional_gold": {
+      "recommendation": "string|null (APPROVE|REVIEW|REJECT)",
+      "risk_tier": "string|null",
+      "human_review_required": "bool",
+      "citations": "string[]",
+      "must_hit_findings": "string[]",
+      "provenance": "string"
+    },
+    "tags": "string[]",
+    "split": "optional string enum: dev|test"
+  },
+  "promotion_requirements": [
+    "manual gold label review complete",
+    "overlap/leakage checks pass against training corpora",
+    "benchmark committee sign-off for high-risk samples"
+  ]
+}
+

@@ -1,0 +1,15 @@
+{
+  "tier": 1,
+  "max_turns": 10,
+  "enable_adaptive": true,
+  "enable_semantic": true,
+  "target_model": {
+    "provider": "anthropic",
+    "model": "claude-3-5-haiku-20241022",
+    "base_url": "",
+    "api_key": ""
+  },
+  "auditor_model": "anthropic/claude-sonnet-4-20250514",
+  "judge_model": "anthropic/claude-opus-4-20250514",
+  "dimensions": null
+}

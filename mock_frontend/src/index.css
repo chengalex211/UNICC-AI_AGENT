@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f5f7;
+    color: #1c1c1e;
+  }
+
+  body {
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: #d1d1d6;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #aeaeb2; }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-apple-lg shadow-apple-card border border-apple-gray-100;
+  }
+
+  .btn-primary {
+    @apply bg-apple-blue hover:bg-apple-blue-hover text-white text-sm font-semibold
+           px-5 py-2.5 rounded-full transition-all duration-200
+           active:scale-95 select-none;
+  }
+
+  .btn-secondary {
+    @apply bg-apple-gray-100 hover:bg-apple-gray-200 text-apple-gray-900 text-sm font-medium
+           px-5 py-2.5 rounded-full transition-all duration-200
+           active:scale-95 select-none;
+  }
+
+  .badge-approve {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold
+           bg-apple-green-bg text-apple-green;
+  }
+  .badge-review {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold
+           bg-apple-orange-bg text-apple-orange;
+  }
+  .badge-reject {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold
+           bg-apple-red-bg text-apple-red;
+  }
+
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-apple text-sm font-medium
+           text-apple-gray-500 hover:text-apple-gray-900 hover:bg-apple-gray-50
+           transition-all duration-150 cursor-pointer;
+  }
+  .nav-item.active {
+    @apply text-apple-blue bg-apple-blue-light font-semibold;
+  }
+
+  .score-bar {
+    @apply h-1.5 rounded-full bg-apple-gray-100 overflow-hidden;
+  }
+  .score-fill {
+    @apply h-full rounded-full transition-all duration-700;
+  }
+
+  .input-field {
+    @apply w-full bg-apple-gray-50 border border-apple-gray-200 rounded-apple
+           px-4 py-3 text-sm text-apple-gray-900 placeholder-apple-gray-400
+           focus:outline-none focus:border-apple-blue focus:ring-2 focus:ring-apple-blue/10
+           transition-all duration-200;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold text-apple-gray-400 uppercase tracking-wider mb-3;
+  }
+}

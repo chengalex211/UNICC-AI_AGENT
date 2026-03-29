@@ -1,0 +1,6 @@
+{
+  "total": 80,
+  "used_report_outputs": 25,
+  "used_heuristic_fallback": 55,
+  "output": "benchmark_data/v1/predictions/predictions_autofill_v1.jsonl"
+}

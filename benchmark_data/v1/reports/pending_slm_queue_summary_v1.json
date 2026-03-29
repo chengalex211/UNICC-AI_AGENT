@@ -1,0 +1,78 @@
+{
+  "total": 80,
+  "by_target": {
+    "e3": 15,
+    "e2": 15,
+    "e1": 40,
+    "council": 10
+  },
+  "by_gold_recommendation": {
+    "REJECT": 34,
+    "REVIEW": 41,
+    "APPROVE": 5
+  },
+  "queue_file": "benchmark_data/v1/predictions/pending_slm_queue_v1.jsonl",
+  "top10": [
+    {
+      "sample_id": "e3_aiid_37_49",
+      "expert_target": "e3",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e3_aiid_26_46",
+      "expert_target": "e3",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e3_aiid_169_1",
+      "expert_target": "e3",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e3_aiid_111_22",
+      "expert_target": "e3",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e2_trainseed_44",
+      "expert_target": "e2",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e2_trainseed_33",
+      "expert_target": "e2",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e2_trainseed_30",
+      "expert_target": "e2",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e2_trainseed_27",
+      "expert_target": "e2",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e2_trainseed_20",
+      "expert_target": "e2",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    },
+    {
+      "sample_id": "e2_trainseed_17",
+      "expert_target": "e2",
+      "priority": 24,
+      "gold_recommendation": "REJECT"
+    }
+  ],
+  "note": "Higher priority = higher risk first."
+}

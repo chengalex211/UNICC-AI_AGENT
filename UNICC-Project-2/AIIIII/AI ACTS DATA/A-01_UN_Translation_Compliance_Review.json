@@ -1,0 +1,176 @@
+{
+  "system_name": "UN Document Translation Assistant v2.1",
+  "assessment_metadata": {
+    "assessor": "UNICC AI Safety Lab Compliance Evaluation (AI-assisted)",
+    "assessment_date": "2026-02-19",
+    "regulatory_basis": [
+      "EU AI Act (Regulation 2024/1689)",
+      "GDPR (EU) 2016/679",
+      "NIST AI RMF 1.0",
+      "UNESCO Recommendation on the Ethics of AI (2021)"
+    ],
+    "system_version": "v2.1",
+    "assessment_scope": "Full compliance review based on system description only"
+  },
+  "eu_ai_act": {
+    "risk_tier": "Minimal-Risk",
+    "risk_tier_rationale": "The system performs a narrow procedural task (document translation) with mandatory human review before any official output is published. It does not fall under any Annex III high-risk category, does not engage in any Article 5 prohibited practice, and satisfies Art. 6(3) derogation criteria: (a) it is intended to perform a narrow procedural task, and (b) it is intended to improve the result of a previously completed human activity. The system is therefore not classified as high-risk.",
+    "annex_iii_category": "Not applicable — no Annex III high-risk category applies. The system does not involve biometrics, critical infrastructure, education/vocational training decision-making, employment, essential public services, law enforcement, migration/border control, or administration of justice/democratic processes.",
+    "applicable_articles": [
+      {
+        "article": "Article 4",
+        "title": "AI Literacy",
+        "requirement": "Providers and deployers shall take measures to ensure a sufficient level of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account technical knowledge, experience, education and training.",
+        "compliance_status": "Partial",
+        "evidence": "The system description confirms professional translators review all outputs before publication, implying a level of operational competence. However, no explicit AI literacy program, training curriculum, or staff competency assessment is mentioned for those operating or using the translation assistant."
+      },
+      {
+        "article": "Article 5",
+        "title": "Prohibited AI Practices",
+        "requirement": "AI systems must not deploy subliminal manipulation, social scoring, real-time biometric identification (in public spaces for law enforcement), emotion inference in workplaces/schools, biometric categorisation based on sensitive attributes, or criminal risk prediction based solely on profiling.",
+        "compliance_status": "Met",
+        "evidence": "The system is a document translation tool with no biometric processing, no profiling, no social scoring, no emotion inference, and no decision-making about natural persons. None of the Article 5(1) prohibited use cases apply."
+      },
+      {
+        "article": "Article 6",
+        "title": "Classification Rules for High-Risk AI Systems",
+        "requirement": "Systems listed in Annex III are high-risk unless they satisfy Art. 6(3) derogation (narrow procedural task, improving prior human activity, detecting patterns without replacing human review, or performing preparatory tasks).",
+        "compliance_status": "Met",
+        "evidence": "The translation system does not appear in any Annex III category. Even if tangentially relevant categories were considered, Art. 6(3)(a) applies (narrow procedural task — translation) and Art. 6(3)(b) applies (improving the result of human translator review). No profiling of natural persons occurs. Provider should document this Art. 6(4) self-assessment."
+      },
+      {
+        "article": "Article 13",
+        "title": "Transparency and Provision of Information to Deployers",
+        "requirement": "AI systems shall be designed and developed to ensure that their operation is sufficiently transparent to enable deployers to interpret the system's output and use it appropriately.",
+        "compliance_status": "Partial",
+        "evidence": "Full technical documentation is confirmed on file (training data sources, model architecture, test results). Output is labeled 'AI-assisted translation, reviewed by human translator.' However, the system description does not detail whether deployers (UN staff) receive explicit instructions for use, interpretability information, or guidance on known limitations and failure modes of the translation model."
+      },
+      {
+        "article": "Article 14",
+        "title": "Human Oversight",
+        "requirement": "AI systems shall be designed with appropriate human oversight measures to minimize risks and enable natural persons to oversee the functioning of the AI system effectively.",
+        "compliance_status": "Met",
+        "evidence": "Strong human oversight is explicitly built into the workflow: all translations are reviewed by professional translators before official publication. This is a robust control that effectively gates AI output from official use without human validation."
+      },
+      {
+        "article": "Article 50",
+        "title": "Transparency Obligations for AI-Generated Content",
+        "requirement": "Providers of AI systems that generate synthetic or AI-processed content must ensure outputs are labeled as AI-generated in a clear and distinguishable manner.",
+        "compliance_status": "Met",
+        "evidence": "Each translation output is labeled 'AI-assisted translation, reviewed by human translator.' This satisfies the transparency labeling requirement for AI-generated/processed content. The label is clear, distinguishable, and attributes both AI involvement and human review."
+      }
+    ]
+  },
+  "gdpr": {
+    "personal_data_processing": false,
+    "personal_data_processing_note": "The system description explicitly states 'No personal data is collected.' However, a residual uncertainty exists: official UN documents may contain incidental references to natural persons (names of diplomats, officials, witnesses, or vulnerable individuals referenced in reports). While the system processes document text, this may constitute processing of personal data under GDPR Art. 4(1) if the text identifies or makes natural persons identifiable. This should be clarified through a formal data mapping exercise.",
+    "special_categories": false,
+    "special_categories_note": "No special category data (Art. 9(1) — racial/ethnic origin, health, biometrics, etc.) is described as being intentionally processed. However, UN reports on humanitarian crises, health emergencies, or refugee situations may incidentally contain such data in document text. This uncertainty warrants a scoping review.",
+    "applicable_articles": [
+      {
+        "article": "Article 5",
+        "title": "Principles Relating to Processing of Personal Data",
+        "requirement": "Personal data must be processed lawfully, fairly and transparently; collected for specified, explicit and legitimate purposes; limited to what is necessary; accurate; not kept longer than necessary; and processed with appropriate security.",
+        "compliance_status": "Met",
+        "evidence": "To the extent any personal data is incidentally processed, the 24-hour data retention limit aligns with the storage limitation principle. The internal-only intranet deployment and non-classification restriction reduce exposure. However, no formal data processing record or lawful basis documentation is mentioned."
+      },
+      {
+        "article": "Article 9",
+        "title": "Processing of Special Categories of Personal Data",
+        "requirement": "Processing of special category data (health, race, religion, political opinions, biometrics, etc.) is prohibited unless an explicit exception applies.",
+        "compliance_status": "N/A",
+        "evidence": "The system description states no personal data is collected. No special category data is described as being processed. If UN documents being translated contain such data incidentally, a lawful basis under Art. 9(2) would need to be documented — most likely Art. 9(2)(g) (substantial public interest) given the UN's mandate."
+      },
+      {
+        "article": "Article 22",
+        "title": "Automated Individual Decision-Making, Including Profiling",
+        "requirement": "Data subjects have the right not to be subject to decisions based solely on automated processing that produce legal effects or similarly significantly affect them.",
+        "compliance_status": "N/A",
+        "evidence": "The system does not make automated decisions about natural persons. It performs document translation only. Professional human translators review all outputs before official use. No legal effects on individuals arise from the AI system's outputs. Article 22 does not apply."
+      },
+      {
+        "article": "Article 35",
+        "title": "Data Protection Impact Assessment (DPIA)",
+        "requirement": "A DPIA is required where processing is likely to result in high risk to rights and freedoms of natural persons, particularly for systematic automated evaluation, large-scale special category data, or systematic monitoring.",
+        "compliance_status": "N/A",
+        "evidence": "Based on the system description, no DPIA appears required: no personal data is stated to be collected, no automated decision-making about individuals occurs, and no special category data is intentionally processed. The 24-hour retention limit and human review gate further reduce risk. A precautionary scoping assessment is recommended to formally confirm no personal data is incidentally processed."
+      }
+    ],
+    "dpia_required": false,
+    "dpia_required_note": "Not required based on stated data processing practices. Recommend formal confirmation through data mapping.",
+    "dpia_completed": "unknown",
+    "legal_jurisdiction_note": "Important: The United Nations generally enjoys immunity from national law under the Convention on the Privileges and Immunities of the United Nations (1946). GDPR does not technically apply to the UN as an international organization. This assessment is conducted for compliance training purposes and to reflect best practices for data protection."
+  },
+  "nist_ai_rmf": {
+    "govern_score": 3,
+    "govern_score_rationale": "The system has identifiable governance strengths: technical documentation exists (training data, architecture, test results), human oversight is mandated, data retention is limited to 24 hours, and a transparency label is applied. However, no explicit AI governance policy, risk management process, AI incident response plan, AI literacy program, or designated accountability roles are mentioned in the system description. GOVERN function is partially implemented.",
+    "map_score": 3,
+    "map_score_rationale": "The system's purpose, deployment context, and data governance are clearly defined. Training data provenance is documented (publicly available historical UN documents, no copyright issues). However, no formal risk or impact assessment is mentioned, no testing for translation bias or quality disparities across language pairs is described, and no stakeholder impact analysis is documented. The scope of potential impacts on end-users of translated documents is not addressed.",
+    "measure_score": 3,
+    "measure_score_rationale": "Test results are mentioned in technical documentation, and human review serves as a quality assurance mechanism. However, no ongoing performance monitoring metrics are described, no translation quality benchmarks or evaluation criteria are specified, no bias metrics across language pairs are mentioned, and no systematic feedback loop from human reviewers to the AI system is documented.",
+    "manage_score": 4,
+    "manage_score_rationale": "The strongest function: mandatory professional translator review before publication effectively gates all AI outputs, the 24-hour retention limit minimizes data exposure, and internal-only deployment constrains attack surface. However, no incident response plan, no escalation procedures for translation errors, and no mechanism for continuous improvement based on reviewer corrections are described.",
+    "key_gaps": [
+      "No explicit AI governance policy or organizational AI risk management framework documented",
+      "No AI literacy or training program for staff operating or using the translation system",
+      "No formal risk/impact assessment or bias evaluation across the six UN language pairs",
+      "No ongoing performance monitoring metrics or translation quality benchmarks beyond human review",
+      "No incident response or error escalation procedure described",
+      "No feedback loop mechanism from human translator reviews to system improvement",
+      "No documentation of known limitations, failure modes, or edge cases communicated to deployers/users",
+      "No stakeholder impact analysis for downstream users of translated documents"
+    ]
+  },
+  "unesco_ai_ethics": {
+    "human_rights_alignment": "Met",
+    "human_rights_evidence": "The system is used for internal document translation with no direct impact on individual human rights determinations. It does not make decisions about persons. The mandatory human review before official publication ensures human oversight of all AI outputs consistent with the UNESCO principle that 'ethical responsibility for decisions based on AI systems should always ultimately be attributable to AI actors.'",
+    "transparency_alignment": "Met",
+    "transparency_evidence": "Outputs are labeled 'AI-assisted translation, reviewed by human translator,' fulfilling UNESCO transparency principles. Full technical documentation is on file. The transparency label at point of output satisfies disclosure requirements.",
+    "accountability_alignment": "Partial",
+    "accountability_evidence": "Human review before publication establishes a clear accountability gate. However, no Ethical Impact Assessment (EIA) — as called for by the UNESCO Recommendation — is mentioned, no formal accountability framework is documented, and no redress mechanism for translation errors or harms is described.",
+    "data_governance_alignment": "Met",
+    "data_governance_evidence": "24-hour retention limit, internal-only deployment, non-classified documents only, and training data from publicly available UN documents with no copyright issues. These practices align with UNESCO data governance principles on minimization and appropriate safeguards.",
+    "gender_and_equity_gap": "No assessment of translation quality equity across language pairs or consideration of potential biases in AI outputs affecting different linguistic communities is mentioned. UNESCO's Recommendation emphasizes eradicating discriminatory biases in AI systems."
+  },
+  "overall_compliance_status": "Conditional",
+  "overall_compliance_rationale": "The UN Document Translation Assistant v2.1 is a well-designed, low-risk AI system that substantially meets applicable regulatory requirements. It correctly avoids all prohibited AI practices, is not classified as high-risk under the EU AI Act, has strong human oversight built into its workflow, applies transparency labeling, and implements sound data minimization. The 'Conditional' status reflects documented gaps in formal governance processes, bias assessment, AI literacy provisions, incident response planning, and the absence of a formal Ethical Impact Assessment. These gaps do not indicate active non-compliance for a Minimal-Risk system, but represent best-practice requirements and areas of uncertainty (particularly around incidental personal data in UN document text) that should be formally resolved.",
+  "compliance_gaps": [
+    "No explicit AI literacy program documented for staff operating or using the system (EU AI Act Art. 4)",
+    "No documentation of whether Art. 6(4) self-assessment (non-high-risk determination) has been formally recorded",
+    "No instructions for use or known limitations communicated to deployers/users beyond the transparency label (EU AI Act Art. 13 partial gap)",
+    "No formal data mapping to confirm that no personal data is incidentally processed when translating UN documents that may reference individuals",
+    "No Ethical Impact Assessment (EIA) as recommended by UNESCO Recommendation on AI Ethics",
+    "No formal bias or quality equity assessment across the six official UN language pairs (Arabic, Chinese, French, Russian, Spanish, English)",
+    "No incident response or error escalation procedure for translation failures or AI system malfunctions",
+    "No ongoing performance monitoring metrics or systematic quality benchmarks beyond ad hoc human review",
+    "No documented feedback loop from professional translator corrections to system improvement",
+    "No formal organizational AI governance policy or AI risk management framework referenced",
+    "GDPR jurisdictional applicability to UN not formally addressed (diplomatic immunity vs. best practice adherence)"
+  ],
+  "recommendations": {
+    "must": [
+      "Conduct and formally document an Art. 6(4) self-assessment confirming the system is not high-risk under the EU AI Act, to satisfy registration and documentation obligations",
+      "Perform a formal data mapping exercise to determine whether UN documents processed by the system incidentally contain personal data, and if so, establish appropriate legal basis and data protection measures",
+      "Implement an AI literacy program for UN staff who operate or use the translation system, as required by EU AI Act Article 4",
+      "Document known limitations and failure modes of the translation model in user-facing guidance materials, as required by EU AI Act Article 13"
+    ],
+    "should": [
+      "Conduct a UNESCO-aligned Ethical Impact Assessment (EIA) to evaluate potential benefits and risks of the system across all stakeholder groups",
+      "Develop and document an AI incident response and error escalation procedure covering translation errors, system outages, and potential misuse",
+      "Establish and document translation quality benchmarks and performance metrics for each of the six official UN language pairs to ensure equitable output quality",
+      "Create a formal feedback mechanism allowing professional translators to log corrections and quality issues, feeding into ongoing system improvement",
+      "Develop an organizational AI governance policy referencing this and other UN AI systems, assigning clear roles and responsibilities",
+      "Conduct periodic bias assessments to identify systematic translation quality disparities across language pairs that could disadvantage certain linguistic communities"
+    ],
+    "could": [
+      "Expand the transparency label to include information about the model's confidence level or known limitations for specific document types",
+      "Establish a formal quality audit program with periodic review of sampled AI translations against professional translator outputs",
+      "Develop a summary of training data content per UNESCO Recommendation and GPAI transparency best practices for internal governance purposes",
+      "Consider extending the system's documentation to include an Annex IV-style technical documentation package aligned with EU AI Act best practices, even though not legally required",
+      "Explore alignment with ISO/IEC 42001 (AI Management Systems) as a voluntary governance framework",
+      "Publish an internal transparency report on AI system usage, quality outcomes, and governance measures to build institutional trust and accountability"
+    ]
+  },
+  "confidence": 0.78,
+  "uncertainty_notes": "Assessment is based solely on the written system description provided; no actual system inspection, code review, or technical audit was conducted. Key uncertainties include: (1) Whether UN documents processed incidentally contain personal data (names of individuals, health data, etc.) — the claim of 'no personal data collected' may reflect collection intent but not processing reality; (2) The actual scope and completeness of the technical documentation referenced — it is noted as existing but content is not verified; (3) The UN's formal legal position under international law exempts it from EU and GDPR obligations — this assessment is conducted as a compliance best-practice exercise for training data purposes; (4) The specific translation model architecture and training methodology are not described, making it impossible to assess translation bias or quality equity with precision; (5) The meaning of 'professional translators review all translations before official publication' in practice — whether this is a full re-translation, spot-check, or light review materially affects the strength of the human oversight control."
+}

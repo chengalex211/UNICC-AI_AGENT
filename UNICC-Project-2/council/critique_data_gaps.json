@@ -1,0 +1,295 @@
+{
+  "summary": {
+    "total_samples": 231,
+    "total_disagree": 79,
+    "disagree_rate": "34.2%",
+    "total_revise_stance": 18,
+    "revise_rate": "7.8%",
+    "divergence_type_distribution": {
+      "test_fail_doc_pass": 57,
+      "framework_difference": 8,
+      "test_pass_doc_fail": 36,
+      "scope_gap": 130
+    },
+    "direction_distribution": {
+      "security_on_governance": 46,
+      "security_on_un_mission_fit": 37,
+      "governance_on_security": 37,
+      "governance_on_un_mission_fit": 37,
+      "un_mission_fit_on_security": 37,
+      "un_mission_fit_on_governance": 37
+    }
+  },
+  "gap_analysis": {
+    "security_on_governance": {
+      "total": 46,
+      "disagree": 46,
+      "revise": 18,
+      "needs_revise": 0,
+      "by_divergence_type": {
+        "test_fail_doc_pass": {
+          "count": 20,
+          "disagree": 20,
+          "revise": 5,
+          "needs_revise": 0
+        },
+        "test_pass_doc_fail": {
+          "count": 10,
+          "disagree": 10,
+          "revise": 5,
+          "needs_revise": 0
+        },
+        "framework_difference": {
+          "count": 8,
+          "disagree": 8,
+          "revise": 4,
+          "needs_revise": 0
+        },
+        "scope_gap": {
+          "count": 8,
+          "disagree": 8,
+          "revise": 4,
+          "needs_revise": 0
+        }
+      }
+    },
+    "security_on_un_mission_fit": {
+      "total": 37,
+      "disagree": 1,
+      "revise": 0,
+      "needs_revise": 3,
+      "by_divergence_type": {
+        "test_fail_doc_pass": {
+          "count": 37,
+          "disagree": 1,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "test_pass_doc_fail": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "framework_difference": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "scope_gap": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        }
+      }
+    },
+    "governance_on_security": {
+      "total": 37,
+      "disagree": 5,
+      "revise": 0,
+      "needs_revise": 3,
+      "by_divergence_type": {
+        "test_fail_doc_pass": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "test_pass_doc_fail": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "framework_difference": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "scope_gap": {
+          "count": 37,
+          "disagree": 5,
+          "revise": 0,
+          "needs_revise": 2
+        }
+      }
+    },
+    "governance_on_un_mission_fit": {
+      "total": 37,
+      "disagree": 8,
+      "revise": 0,
+      "needs_revise": 3,
+      "by_divergence_type": {
+        "test_fail_doc_pass": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "test_pass_doc_fail": {
+          "count": 26,
+          "disagree": 6,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "framework_difference": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "scope_gap": {
+          "count": 11,
+          "disagree": 2,
+          "revise": 0,
+          "needs_revise": 2
+        }
+      }
+    },
+    "un_mission_fit_on_security": {
+      "total": 37,
+      "disagree": 2,
+      "revise": 0,
+      "needs_revise": 3,
+      "by_divergence_type": {
+        "test_fail_doc_pass": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "test_pass_doc_fail": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "framework_difference": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "scope_gap": {
+          "count": 37,
+          "disagree": 2,
+          "revise": 0,
+          "needs_revise": 2
+        }
+      }
+    },
+    "un_mission_fit_on_governance": {
+      "total": 37,
+      "disagree": 17,
+      "revise": 0,
+      "needs_revise": 3,
+      "by_divergence_type": {
+        "test_fail_doc_pass": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "test_pass_doc_fail": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "framework_difference": {
+          "count": 0,
+          "disagree": 0,
+          "revise": 0,
+          "needs_revise": 2
+        },
+        "scope_gap": {
+          "count": 37,
+          "disagree": 17,
+          "revise": 0,
+          "needs_revise": 2
+        }
+      }
+    }
+  },
+  "needs_generation": [
+    {
+      "direction": "security_on_un_mission_fit",
+      "issue": "insufficient_revise_stance",
+      "current": 0,
+      "target": 3,
+      "to_generate": 3,
+      "suggested_div_types": [
+        "test_fail_doc_pass",
+        "test_pass_doc_fail",
+        "framework_difference",
+        "scope_gap"
+      ]
+    },
+    {
+      "direction": "governance_on_security",
+      "issue": "insufficient_revise_stance",
+      "current": 0,
+      "target": 3,
+      "to_generate": 3,
+      "suggested_div_types": [
+        "test_fail_doc_pass",
+        "test_pass_doc_fail",
+        "framework_difference",
+        "scope_gap"
+      ]
+    },
+    {
+      "direction": "governance_on_un_mission_fit",
+      "issue": "insufficient_revise_stance",
+      "current": 0,
+      "target": 3,
+      "to_generate": 3,
+      "suggested_div_types": [
+        "test_fail_doc_pass",
+        "test_pass_doc_fail",
+        "framework_difference",
+        "scope_gap"
+      ]
+    },
+    {
+      "direction": "un_mission_fit_on_security",
+      "issue": "insufficient_revise_stance",
+      "current": 0,
+      "target": 3,
+      "to_generate": 3,
+      "suggested_div_types": [
+        "test_fail_doc_pass",
+        "test_pass_doc_fail",
+        "framework_difference",
+        "scope_gap"
+      ]
+    },
+    {
+      "direction": "un_mission_fit_on_governance",
+      "issue": "insufficient_revise_stance",
+      "current": 0,
+      "target": 3,
+      "to_generate": 3,
+      "suggested_div_types": [
+        "test_fail_doc_pass",
+        "test_pass_doc_fail",
+        "framework_difference",
+        "scope_gap"
+      ]
+    }
+  ],
+  "recommendation": {
+    "min_to_generate": 15,
+    "priority_directions": [
+      "security_on_un_mission_fit",
+      "governance_on_security",
+      "governance_on_un_mission_fit",
+      "un_mission_fit_on_security",
+      "un_mission_fit_on_governance"
+    ],
+    "note": "The biggest gap is Revise stance samples in non-security_on_governance directions. Each direction needs ~3 Revise examples to teach the SLM that score changes are possible. Generate these manually or with targeted API calls using the template below."
+  }
+}

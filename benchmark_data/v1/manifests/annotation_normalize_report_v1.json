@@ -1,0 +1,21 @@
+{
+  "input_csv": "/Users/yangjunjie/Capstone/benchmark_data/v1/manifests/annotation_template_v1_annotated_cleaned.csv",
+  "output_csv": "/Users/yangjunjie/Capstone/benchmark_data/v1/manifests/annotation_template_v1_annotated_cleaned.csv",
+  "total_rows": 80,
+  "changed_rows": 1,
+  "changed_cells": 1,
+  "notes": [
+    "review_status: annotated -> approved",
+    "list fields normalized to ' || ' separator",
+    "common weak citation patterns made more explicit"
+  ],
+  "sample_changes": [
+    {
+      "line": 42,
+      "sample_id": "e2_trainseed_33",
+      "field": "gold_must_citations",
+      "old": "EU AI Act Art.13 (transparency) || GDPR Art.5(1)(a) || UN Guiding Principles on Business and Human Rights",
+      "new": "EU AI Act Art.13 (transparency) || GDPR Art.5(1)(a) || UN Guiding Principles on Business and Human Rights (Principle 13)"
+    }
+  ]
+}
