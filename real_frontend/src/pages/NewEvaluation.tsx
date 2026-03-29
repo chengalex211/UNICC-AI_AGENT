@@ -18,6 +18,11 @@ const DEPLOY_ZONES = [
   'UN Headquarters', 'Field Office', 'Global/Multi-Region',
 ]
 
+const defaultCouncilBackend = (): 'claude' | 'vllm' => {
+  const v = import.meta.env.VITE_COUNCIL_BACKEND
+  return v === 'vllm' ? 'vllm' : 'claude'
+}
+
 const NewEvaluation: FC<Props> = ({ onSubmit }) => {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [loading, setLoading] = useState(false)
@@ -26,6 +31,12 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
     system_name: '', agent_id: '', category: '', deploy_zone: '',
     description: '', capabilities: '', data_sources: '', human_oversight: '',
     mode: 'B' as 'A' | 'B',
+    llm_backend: defaultCouncilBackend(),
+    vllm_base_url:
+      (import.meta.env.VITE_VLLM_BASE_URL as string | undefined) ?? 'http://127.0.0.1:8000',
+    vllm_model:
+      (import.meta.env.VITE_VLLM_MODEL as string | undefined) ??
+      'meta-llama/Meta-Llama-3-70B-Instruct',
   })
   const [inputMode, setInputMode] = useState<'paste' | 'file'>('paste')
   const [fileError, setFileError] = useState<string | null>(null)
@@ -36,7 +47,7 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
     setSubmitError(null)
     setLoading(true)
     try {
-      const report = await submitCouncilEvaluation({
+      const payload: Parameters<typeof submitCouncilEvaluation>[0] = {
         agent_id: form.agent_id,
         system_name: form.system_name || form.agent_id,
         system_description: [form.description, form.capabilities].filter(Boolean).join('\n\n'),
@@ -44,8 +55,15 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
         deployment_context: form.deploy_zone || undefined,
         data_access: form.data_sources ? [form.data_sources] : [],
         risk_indicators: form.human_oversight ? [form.human_oversight] : [],
-        backend: 'claude',
-      })
+        backend: form.llm_backend,
+      }
+      if (form.llm_backend === 'vllm') {
+        const url = form.vllm_base_url.trim()
+        const model = form.vllm_model.trim()
+        if (url) payload.vllm_base_url = url
+        if (model) payload.vllm_model = model
+      }
+      const report = await submitCouncilEvaluation(payload)
       onSubmit(report)
     } catch (e) {
       setSubmitError(e instanceof Error ? e.message : String(e))
@@ -122,7 +140,68 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
               </div>
             </div>
             <div>
-              <p className="section-label">Evaluation Mode</p>
+              <p className="section-label">Council LLM backend</p>
+              <p className="text-[11px] text-apple-gray-400 mb-2">
+                Full pipeline (3 experts + critiques) uses this backend. Optional env defaults:{' '}
+                <code className="text-[10px] bg-apple-gray-100 px-1 rounded">VITE_COUNCIL_BACKEND</code>,{' '}
+                <code className="text-[10px] bg-apple-gray-100 px-1 rounded">VITE_VLLM_BASE_URL</code>,{' '}
+                <code className="text-[10px] bg-apple-gray-100 px-1 rounded">VITE_VLLM_MODEL</code>.
+              </p>
+              <div className="flex flex-col gap-3 mt-2">
+                <label className={`flex items-start gap-3 p-3 rounded-apple border-2 cursor-pointer transition-colors ${form.llm_backend === 'claude' ? 'border-apple-blue bg-apple-blue-light' : 'border-apple-gray-100 hover:border-apple-gray-200'}`}>
+                  <input
+                    type="radio"
+                    name="llm_backend"
+                    checked={form.llm_backend === 'claude'}
+                    onChange={() => { hapticSelect(); setForm(f => ({ ...f, llm_backend: 'claude' })) }}
+                    className="mt-1 w-4 h-4 text-apple-blue"
+                  />
+                  <div>
+                    <span className="text-sm font-semibold text-apple-gray-900">Claude (Anthropic API)</span>
+                    <p className="text-xs text-apple-gray-500 mt-0.5">Server needs ANTHROPIC_API_KEY. No vLLM required.</p>
+                  </div>
+                </label>
+                <label className={`flex items-start gap-3 p-3 rounded-apple border-2 cursor-pointer transition-colors ${form.llm_backend === 'vllm' ? 'border-apple-blue bg-apple-blue-light' : 'border-apple-gray-100 hover:border-apple-gray-200'}`}>
+                  <input
+                    type="radio"
+                    name="llm_backend"
+                    checked={form.llm_backend === 'vllm'}
+                    onChange={() => { hapticSelect(); setForm(f => ({ ...f, llm_backend: 'vllm' })) }}
+                    className="mt-1 w-4 h-4 text-apple-blue"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-semibold text-apple-gray-900">vLLM / SLM (OpenAI-compatible)</span>
+                    <p className="text-xs text-apple-gray-500 mt-0.5 mb-3">Experts and critiques call your inference server. Ensure the URL is reachable from the machine running frontend_api.</p>
+                    {form.llm_backend === 'vllm' && (
+                      <div className="space-y-3 pt-1">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-apple-gray-600 mb-1">vLLM base URL</label>
+                          <input
+                            className="input-field font-mono text-xs"
+                            placeholder="http://127.0.0.1:8000"
+                            value={form.vllm_base_url}
+                            onChange={e => setForm(f => ({ ...f, vllm_base_url: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-semibold text-apple-gray-600 mb-1">Model name</label>
+                          <input
+                            className="input-field font-mono text-xs"
+                            placeholder="meta-llama/Meta-Llama-3-70B-Instruct"
+                            value={form.vllm_model}
+                            onChange={e => setForm(f => ({ ...f, vllm_model: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <p className="section-label">Expert 1 style (reference only)</p>
+              <p className="text-[11px] text-apple-gray-400 mb-2">Council run uses Expert 1 document-analysis path from the orchestrator. Modes below are for future Expert1-only API use.</p>
               <div className="flex flex-col gap-3 mt-2">
                 <label className={`flex items-start gap-3 p-3 rounded-apple border-2 cursor-pointer transition-colors ${form.mode === 'A' ? 'border-apple-blue bg-apple-blue-light' : 'border-apple-gray-100 hover:border-apple-gray-200'}`}>
                   <input type="radio" name="mode" value="A" checked={form.mode === 'A'} onChange={() => { hapticSelect(); setForm(f => ({ ...f, mode: 'A' })) }} className="mt-1 w-4 h-4 text-apple-blue" />
@@ -254,6 +333,19 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
             <div className="p-4 rounded-apple bg-apple-gray-50 border border-apple-gray-100">
               <p className="text-xs font-semibold text-apple-gray-600 mb-2">Description</p>
               <p className="text-sm text-apple-gray-700 leading-relaxed">{form.description}</p>
+            </div>
+
+            <div className="p-4 rounded-apple bg-apple-gray-50 border border-apple-gray-100">
+              <p className="text-xs font-semibold text-apple-gray-600 mb-2">LLM Backend</p>
+              {form.llm_backend === 'claude' ? (
+                <p className="text-sm text-apple-gray-700">Claude (Anthropic API) — server needs <code className="text-[11px] bg-apple-gray-100 px-1 rounded">ANTHROPIC_API_KEY</code></p>
+              ) : (
+                <div className="space-y-1">
+                  <p className="text-sm text-apple-gray-700">vLLM / SLM (OpenAI-compatible)</p>
+                  <p className="text-xs text-apple-gray-500 font-mono">{form.vllm_base_url || 'http://127.0.0.1:8000'}</p>
+                  <p className="text-xs text-apple-gray-500 font-mono">{form.vllm_model || 'meta-llama/Meta-Llama-3-70B-Instruct'}</p>
+                </div>
+              )}
             </div>
 
             <div className="p-4 rounded-apple bg-apple-gray-50 border border-apple-gray-100">

@@ -1,6 +1,7 @@
 # Environment / secrets — 切勿上传
 .env
 .env.*
+!.env.example
 .env.local
 .env.development
 .env.production
