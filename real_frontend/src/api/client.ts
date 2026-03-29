@@ -68,6 +68,9 @@ export interface EvaluationListItem {
   consensus?: 'FULL' | 'PARTIAL' | 'SPLIT' | null
   summary_core?: string
   file_path?: string
+  rec_security?: string | null
+  rec_governance?: string | null
+  rec_un_mission?: string | null
 }
 
 export async function submitExpert1Attack(

@@ -32,7 +32,7 @@ const CouncilReview: FC<Props> = ({ evaluation }) => {
             { label: 'Expert Reports', sub: '3 independent assessments', icon: '◈', done: true },
             { label: 'Cross-Critique', sub: `${council_critiques.length} critiques filed`, icon: '⇌', done: true },
             { label: 'Council Synthesis', sub: 'Disagreements resolved', icon: '◉', done: true },
-            { label: 'Final Decision', sub: 'REJECT issued', icon: '✓', done: true },
+            { label: 'Final Decision', sub: `${eval_.decision} issued`, icon: '✓', done: true },
           ].map((step, i) => (
             <div key={i} className="flex items-start gap-3 flex-1">
               <div className={`mt-0.5 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0

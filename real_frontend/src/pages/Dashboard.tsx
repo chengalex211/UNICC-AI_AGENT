@@ -36,6 +36,16 @@ const DonutRing: FC<{ approve: number; review: number; reject: number; total: nu
   )
 }
 
+/** Pairwise agreement %: rows where both experts have a non-null rec that matches */
+const pairAgreement = (
+  rows: { a: string | null | undefined; b: string | null | undefined }[]
+): number => {
+  const both = rows.filter(r => r.a && r.b)
+  if (both.length === 0) return 0
+  const agree = both.filter(r => r.a === r.b).length
+  return Math.round((agree / both.length) * 100)
+}
+
 const Dashboard: FC<Props> = ({ onSelect, onNewEvaluation, evaluations }) => {
   const total = Math.max(evaluations.length, 1)
   const approved = evaluations.filter(e => e.decision === 'APPROVE').length
@@ -44,6 +54,18 @@ const Dashboard: FC<Props> = ({ onSelect, onNewEvaluation, evaluations }) => {
   const fullConsensus = evaluations.filter(e => e.consensus === 'FULL').length
   const partialConsensus = evaluations.filter(e => e.consensus === 'PARTIAL').length
   const splitConsensus = evaluations.filter(e => e.consensus === 'SPLIT').length
+
+  // Pairwise expert agreement — uses real rec_* columns from the API
+  const hasExpertRecs = evaluations.some(e => e.rec_security || e.rec_governance || e.rec_un_mission)
+  const e1e2 = pairAgreement(evaluations.map(e => ({ a: e.rec_security,   b: e.rec_governance })))
+  const e2e3 = pairAgreement(evaluations.map(e => ({ a: e.rec_governance, b: e.rec_un_mission })))
+  const e1e3 = pairAgreement(evaluations.map(e => ({ a: e.rec_security,   b: e.rec_un_mission })))
+  const triAll = pairAgreement(
+    evaluations.map(e => ({
+      a: (e.rec_security && e.rec_governance && e.rec_security === e.rec_governance) ? e.rec_security : null,
+      b: e.rec_un_mission,
+    }))
+  )
 
   return (
     <div className="p-8 space-y-8 animate-fade-in">
@@ -119,27 +141,33 @@ const Dashboard: FC<Props> = ({ onSelect, onNewEvaluation, evaluations }) => {
         {/* Expert agreement matrix */}
         <div className="card p-6 col-span-1">
           <p className="section-label">Expert Alignment</p>
-          <div className="space-y-3 mt-1">
-            {[
-              { label: 'E1 × E2 Agreement', pct: 68 },
-              { label: 'E2 × E3 Agreement', pct: 72 },
-              { label: 'E1 × E3 Agreement', pct: 79 },
-              { label: 'Full Tri-Agreement', pct: 50 },
-            ].map(row => (
-              <div key={row.label}>
-                <div className="flex justify-between mb-1">
-                  <span className="text-xs text-apple-gray-600">{row.label}</span>
-                  <span className="text-xs font-semibold text-apple-gray-900">{row.pct}%</span>
+          {!hasExpertRecs ? (
+            <p className="text-xs text-apple-gray-400 mt-3">
+              No expert-level data yet — submit evaluations to populate.
+            </p>
+          ) : (
+            <div className="space-y-3 mt-1">
+              {[
+                { label: 'Security × Governance', pct: e1e2 },
+                { label: 'Governance × UN Mission', pct: e2e3 },
+                { label: 'Security × UN Mission', pct: e1e3 },
+                { label: 'Full Tri-Agreement', pct: triAll },
+              ].map(row => (
+                <div key={row.label}>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-xs text-apple-gray-600">{row.label}</span>
+                    <span className="text-xs font-semibold text-apple-gray-900">{row.pct}%</span>
+                  </div>
+                  <div className="score-bar">
+                    <div
+                      className={`score-fill ${row.pct >= 75 ? 'bg-apple-green' : row.pct >= 60 ? 'bg-apple-blue' : 'bg-apple-orange'}`}
+                      style={{ width: `${row.pct}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="score-bar">
-                  <div
-                    className={`score-fill ${row.pct >= 75 ? 'bg-apple-green' : row.pct >= 60 ? 'bg-apple-blue' : 'bg-apple-orange'}`}
-                    style={{ width: `${row.pct}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

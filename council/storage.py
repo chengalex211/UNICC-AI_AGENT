@@ -56,24 +56,44 @@ def save_full_report(report: CouncilReport) -> Tuple[str, Path]:
   return report.incident_id, path
 
 
+def _expert_rec(report: CouncilReport, key: str) -> str | None:
+  """Extract a single expert's recommendation from expert_reports dict."""
+  er = (report.expert_reports or {}).get(key)
+  if not er:
+    return None
+  if isinstance(er, dict):
+    return er.get("recommendation")
+  return getattr(er, "recommendation", None)
+
+
 def save_to_sqlite(report: CouncilReport, file_path: Path) -> None:
   conn = sqlite3.connect(DB_PATH)
   cur = conn.cursor()
   cur.execute(
     """
     CREATE TABLE IF NOT EXISTS evaluations (
-      incident_id  TEXT PRIMARY KEY,
-      agent_id     TEXT,
-      system_name  TEXT,
-      created_at   TEXT,
-      decision     TEXT,
-      risk_tier    TEXT,
-      consensus    TEXT,
-      summary_core TEXT,
-      file_path    TEXT
+      incident_id       TEXT PRIMARY KEY,
+      agent_id          TEXT,
+      system_name       TEXT,
+      created_at        TEXT,
+      decision          TEXT,
+      risk_tier         TEXT,
+      consensus         TEXT,
+      summary_core      TEXT,
+      file_path         TEXT,
+      rec_security      TEXT,
+      rec_governance    TEXT,
+      rec_un_mission    TEXT
     )
     """
   )
+  # Migrate older DBs that don't have the three expert-rec columns yet
+  for col in ("rec_security", "rec_governance", "rec_un_mission"):
+    try:
+      cur.execute(f"ALTER TABLE evaluations ADD COLUMN {col} TEXT")
+    except sqlite3.OperationalError:
+      pass  # column already exists
+
   decision = report.council_decision
   summary = build_summary_core(report)
   created_at = datetime.utcnow().isoformat() + "Z"
@@ -82,8 +102,9 @@ def save_to_sqlite(report: CouncilReport, file_path: Path) -> None:
     """
     INSERT OR REPLACE INTO evaluations
     (incident_id, agent_id, system_name, created_at,
-     decision, risk_tier, consensus, summary_core, file_path)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+     decision, risk_tier, consensus, summary_core, file_path,
+     rec_security, rec_governance, rec_un_mission)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
     (
       report.incident_id,
@@ -95,6 +116,9 @@ def save_to_sqlite(report: CouncilReport, file_path: Path) -> None:
       decision.consensus_level if decision else "PARTIAL",
       summary,
       str(file_path),
+      _expert_rec(report, "security"),
+      _expert_rec(report, "governance"),
+      _expert_rec(report, "un_mission_fit"),
     ),
   )
   conn.commit()

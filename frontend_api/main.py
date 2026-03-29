@@ -600,7 +600,8 @@ def list_evaluations(
     cur = conn.cursor()
     cur.execute(
         """
-        SELECT incident_id, agent_id, system_name, created_at, decision, risk_tier, consensus, summary_core, file_path
+        SELECT incident_id, agent_id, system_name, created_at, decision, risk_tier, consensus,
+               summary_core, file_path, rec_security, rec_governance, rec_un_mission
         FROM evaluations
         ORDER BY created_at DESC
         LIMIT ? OFFSET ?
@@ -669,7 +670,8 @@ def search_knowledge(
     like_q = f"%{query}%"
     cur.execute(
         """
-        SELECT incident_id, agent_id, system_name, created_at, decision, risk_tier, consensus, summary_core, file_path
+        SELECT incident_id, agent_id, system_name, created_at, decision, risk_tier, consensus,
+               summary_core, file_path, rec_security, rec_governance, rec_un_mission
         FROM evaluations
         WHERE summary_core LIKE ? OR agent_id LIKE ? OR system_name LIKE ?
         ORDER BY created_at DESC
