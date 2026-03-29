@@ -126,6 +126,18 @@ export interface RepoAnalyzeResponse {
   source: string
 }
 
+export async function downloadEvaluationPdf(incidentId: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/evaluations/${incidentId}/pdf`)
+  if (!res.ok) throw new Error(await res.text())
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `UNICC-Report-${incidentId}.pdf`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export async function analyzeRepo(
   body: RepoAnalyzeRequest
 ): Promise<RepoAnalyzeResponse> {

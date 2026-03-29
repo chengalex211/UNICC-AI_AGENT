@@ -116,6 +116,7 @@ export function councilReportToDetailedEvaluation(report: CouncilReportResponse)
   const disagreements = Array.isArray(decision.disagreements) ? decision.disagreements : []
 
   return {
+    incident_id: report.incident_id,
     agent_id: report.agent_id,
     system_name: report.system_name || report.agent_id,
     category: 'Submitted System',

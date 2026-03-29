@@ -10,7 +10,7 @@ from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel, Field
 
 
@@ -51,6 +51,251 @@ def _load_report_json(incident_id: str) -> dict:
         return json.loads(p.read_text(encoding="utf-8"))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to read report JSON: {e}")
+
+
+def _report_to_pdf(r: dict) -> bytes:
+    """Generate a structured PDF from a CouncilReport dict. Returns raw bytes."""
+    import io
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import mm
+    from reportlab.platypus import (
+        SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
+        HRFlowable, KeepTogether,
+    )
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buf, pagesize=A4,
+        leftMargin=20*mm, rightMargin=20*mm,
+        topMargin=22*mm, bottomMargin=22*mm,
+    )
+
+    # ── palette ───────────────────────────────────────────────────────────────
+    BLUE   = colors.HexColor("#007AFF")
+    GREEN  = colors.HexColor("#34C759")
+    ORANGE = colors.HexColor("#FF9500")
+    RED    = colors.HexColor("#FF3B30")
+    GRAY1  = colors.HexColor("#1C1C1E")
+    GRAY3  = colors.HexColor("#48484A")
+    GRAY5  = colors.HexColor("#8E8E93")
+    GRAY6  = colors.HexColor("#F2F2F7")
+
+    def decision_color(rec: str) -> object:
+        rec = (rec or "").upper()
+        if rec == "APPROVE": return GREEN
+        if rec == "REJECT":  return RED
+        return ORANGE
+
+    base = getSampleStyleSheet()
+
+    def S(name, **kw):
+        return ParagraphStyle(name, parent=base["Normal"], **kw)
+
+    cover_title  = S("CoverTitle",  fontSize=22, textColor=BLUE,  spaceAfter=4, fontName="Helvetica-Bold")
+    cover_sub    = S("CoverSub",    fontSize=11, textColor=GRAY3, spaceAfter=2)
+    cover_meta   = S("CoverMeta",   fontSize=9,  textColor=GRAY5, spaceAfter=2)
+    h1_style     = S("H1",          fontSize=13, textColor=GRAY1, spaceBefore=10, spaceAfter=4, fontName="Helvetica-Bold")
+    h2_style     = S("H2",          fontSize=11, textColor=BLUE,  spaceBefore=8,  spaceAfter=3, fontName="Helvetica-Bold")
+    h3_style     = S("H3",          fontSize=10, textColor=GRAY3, spaceBefore=6,  spaceAfter=2, fontName="Helvetica-Bold")
+    body_style   = S("Body",        fontSize=9,  textColor=GRAY3, spaceAfter=3,   leading=14)
+    small_style  = S("Small",       fontSize=8,  textColor=GRAY5, spaceAfter=2,   leading=12)
+    bullet_style = S("Bullet",      fontSize=9,  textColor=GRAY3, spaceAfter=2,   leftIndent=10, leading=13)
+    label_style  = S("Label",       fontSize=8,  textColor=GRAY5, spaceAfter=1,   fontName="Helvetica-Bold", textTransform="uppercase")
+    code_style   = S("Code",        fontSize=8,  textColor=GRAY3, fontName="Courier", spaceAfter=2, leading=12)
+
+    def hr(): return HRFlowable(width="100%", thickness=0.5, color=GRAY6, spaceAfter=4, spaceBefore=4)
+    def sp(h=4): return Spacer(1, h*mm)
+
+    def safe(txt: str, max_chars: int = 2000) -> str:
+        if not txt: return ""
+        txt = str(txt)[:max_chars]
+        return txt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    story = []
+
+    # ── Cover ─────────────────────────────────────────────────────────────────
+    cd   = r.get("council_decision") or {}
+    rec  = cd.get("final_recommendation", "N/A")
+    cons = cd.get("consensus_level", "N/A")
+
+    story.append(sp(8))
+    story.append(Paragraph("UNICC AI Safety Council", cover_title))
+    story.append(Paragraph("Full Assessment Report", cover_sub))
+    story.append(sp(2))
+
+    dec_color = decision_color(rec)
+    story.append(Table(
+        [[Paragraph(f'<font color="{dec_color.hexval()}"><b>{rec}</b></font>', S("Dec", fontSize=18, fontName="Helvetica-Bold")),
+          Paragraph(f"Consensus: {cons}", S("Cons", fontSize=10, textColor=GRAY5))]],
+        colWidths=["60%", "40%"],
+        style=TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), GRAY6),
+            ("ROUNDEDCORNERS", (0, 0), (-1, -1), [4, 4, 4, 4]),
+            ("TOPPADDING",    (0, 0), (-1, -1), 8),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+        ]),
+    ))
+    story.append(sp(3))
+    story.append(Paragraph(f"<b>System:</b>  {safe(r.get('system_name', r.get('agent_id', '')))}",  cover_meta))
+    story.append(Paragraph(f"<b>Agent ID:</b> {safe(r.get('agent_id', ''))}",  cover_meta))
+    story.append(Paragraph(f"<b>Incident:</b> {safe(r.get('incident_id', ''))}",  cover_meta))
+    story.append(Paragraph(f"<b>Timestamp:</b> {safe(r.get('timestamp', '')[:19].replace('T', ' '))} UTC",  cover_meta))
+    story.append(hr())
+
+    # ── Section 0: System description ─────────────────────────────────────────
+    story.append(Paragraph("0. System Under Evaluation", h1_style))
+    desc = r.get("system_description") or ""
+    story.append(Paragraph(safe(desc, 1200), body_style))
+    story.append(hr())
+
+    # ── Section 1: Expert Reports ──────────────────────────────────────────────
+    story.append(Paragraph("1. Expert Analyses &amp; Judgments", h1_style))
+    expert_map = {
+        "security":      ("🔒", "Expert 1 — Security &amp; Adversarial"),
+        "governance":    ("⚖️",  "Expert 2 — Governance &amp; Compliance"),
+        "un_mission_fit":("🌐", "Expert 3 — UN Mission Fit"),
+    }
+    for key, (icon, title) in expert_map.items():
+        er = (r.get("expert_reports") or {}).get(key, {})
+        if not er:
+            continue
+        exp_rec = er.get("recommendation", "N/A")
+        ec = decision_color(exp_rec)
+        block = []
+        block.append(Paragraph(
+            f'{title} — <font color="{ec.hexval()}"><b>{exp_rec}</b></font>', h2_style))
+
+        # error fallback
+        if er.get("error"):
+            block.append(Paragraph(f"⚠ Module error: {safe(er['error'])}", small_style))
+        else:
+            # dimension scores
+            dim_scores = er.get("dimension_scores") or {}
+            if dim_scores:
+                block.append(Paragraph("Dimension Scores", label_style))
+                rows = [[Paragraph(f"<b>{k.replace('_',' ').title()}</b>", small_style),
+                         Paragraph(str(v), small_style)]
+                        for k, v in dim_scores.items()]
+                t = Table(rows, colWidths=["60%", "40%"],
+                          style=TableStyle([
+                              ("BACKGROUND", (0, 0), (-1, -1), GRAY6),
+                              ("TOPPADDING",    (0, 0), (-1, -1), 3),
+                              ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                              ("LEFTPADDING",   (0, 0), (-1, -1), 6),
+                          ]))
+                block.append(t)
+                block.append(sp(2))
+
+            # key findings
+            findings = er.get("key_findings") or []
+            if findings:
+                block.append(Paragraph("Key Findings", label_style))
+                for f in findings[:6]:
+                    block.append(Paragraph(f"• {safe(f, 400)}", bullet_style))
+                block.append(sp(1))
+
+            # narrative
+            narrative = er.get("narrative") or ""
+            if narrative:
+                block.append(Paragraph("Narrative", label_style))
+                block.append(Paragraph(safe(narrative, 800), body_style))
+
+            # violations / gaps
+            violations = er.get("un_principle_violations") or er.get("key_gaps") or []
+            if violations:
+                block.append(Paragraph("Compliance Gaps / Violations", label_style))
+                for v in violations[:5]:
+                    block.append(Paragraph(f"• {safe(v, 300)}", bullet_style))
+
+        story.append(KeepTogether(block))
+        story.append(sp(2))
+
+    story.append(hr())
+
+    # ── Section 2: Council Debate ──────────────────────────────────────────────
+    story.append(Paragraph("2. Council Debate (Cross-Expert Critiques)", h1_style))
+    critiques = r.get("critiques") or {}
+    for i, (ckey, cv) in enumerate(critiques.items()):
+        agrees = cv.get("agrees", True)
+        agree_label = "Agrees" if agrees else "Disagrees"
+        agree_color = GREEN.hexval() if agrees else ORANGE.hexval()
+        from_e = cv.get("from_expert", "").replace("_", " ").title()
+        on_e   = cv.get("on_expert",   "").replace("_", " ").title()
+        block = []
+        block.append(Paragraph(
+            f'Critique {i+1}: {safe(from_e)} → {safe(on_e)} '
+            f'— <font color="{agree_color}"><b>{agree_label}</b></font>',
+            h3_style))
+        kp = safe(cv.get("key_point", ""), 400)
+        block.append(Paragraph(f'<i>"{kp}"</i>', body_style))
+        stance = safe(cv.get("stance", ""), 200)
+        if stance:
+            block.append(Paragraph(f"<b>Stance:</b> {stance}", small_style))
+        evs = cv.get("evidence_references") or []
+        for ev in evs[:3]:
+            block.append(Paragraph(f"§ {safe(ev, 200)}", bullet_style))
+        story.append(KeepTogether(block))
+        story.append(sp(1))
+
+    story.append(hr())
+
+    # ── Section 3: Final Decision ──────────────────────────────────────────────
+    story.append(Paragraph("3. Expert Final Opinions &amp; Arbitration", h1_style))
+    rows = []
+    for key, (_, title) in expert_map.items():
+        er = (r.get("expert_reports") or {}).get(key, {})
+        exp_rec = er.get("recommendation", "N/A")
+        ec = decision_color(exp_rec)
+        rows.append([
+            Paragraph(title, small_style),
+            Paragraph(f'<font color="{ec.hexval()}"><b>{exp_rec}</b></font>', small_style),
+        ])
+    t = Table(rows, colWidths=["70%", "30%"],
+              style=TableStyle([
+                  ("BACKGROUND", (0, 0), (-1, -1), GRAY6),
+                  ("TOPPADDING",    (0, 0), (-1, -1), 4),
+                  ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                  ("LEFTPADDING",   (0, 0), (-1, -1), 8),
+                  ("LINEBELOW", (0, 0), (-1, -2), 0.5, colors.white),
+              ]))
+    story.append(t)
+    story.append(sp(3))
+
+    story.append(Paragraph("Council Decision", h2_style))
+    dec_col = decision_color(rec)
+    story.append(Table(
+        [[Paragraph(f'<font color="{dec_col.hexval()}"><b>{rec}</b></font>',
+                    S("BigDec", fontSize=16, fontName="Helvetica-Bold")),
+          Paragraph(f"Consensus: <b>{cons}</b><br/>Human Oversight: <b>{cd.get('human_oversight_required','?')}</b><br/>Blocks Deployment: <b>{cd.get('compliance_blocks_deployment','?')}</b>",
+                    small_style)]],
+        colWidths=["35%", "65%"],
+        style=TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), GRAY6),
+            ("TOPPADDING",    (0, 0), (-1, -1), 8),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+        ]),
+    ))
+    story.append(sp(3))
+
+    rationale = cd.get("rationale") or r.get("council_note") or ""
+    if rationale:
+        story.append(Paragraph("Rationale", label_style))
+        story.append(Paragraph(safe(rationale, 1200), body_style))
+
+    story.append(hr())
+    story.append(Paragraph(
+        "This report was generated by the UNICC AI Safety Council automated pipeline. "
+        "All findings should be reviewed by qualified human evaluators before any deployment decision.",
+        S("Footer", fontSize=8, textColor=GRAY5, alignment=TA_CENTER)
+    ))
+
+    doc.build(story)
+    return buf.getvalue()
 
 
 def _report_to_markdown(r: dict) -> str:
@@ -380,6 +625,20 @@ def get_evaluation_markdown(incident_id: str) -> PlainTextResponse:
         content=md,
         media_type="text/markdown; charset=utf-8",
         headers={"Content-Disposition": f"attachment; filename={incident_id}.md"},
+    )
+
+
+@app.get("/evaluations/{incident_id}/pdf")
+def get_evaluation_pdf(incident_id: str) -> Response:
+    report = _load_report_json(incident_id)
+    try:
+        pdf_bytes = _report_to_pdf(report)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"PDF generation failed: {e}")
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={incident_id}.pdf"},
     )
 
 

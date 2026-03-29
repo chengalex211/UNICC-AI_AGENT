@@ -3,12 +3,15 @@ import { detailedEval, type DetailedEvaluation } from '../data/mockData'
 import { RecBadge, ConsensusBadge } from '../components/Badge'
 import { hapticButton } from '../utils/haptic'
 import { evaluationToMarkdown } from '../utils/reportToMarkdown'
+import { downloadEvaluationPdf } from '../api/client'
 
 interface Props { evaluation?: DetailedEvaluation | null }
 
 const FinalReport: FC<Props> = ({ evaluation }) => {
   const eval_ = evaluation ?? detailedEval
   const [copied, setCopied] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [pdfError, setPdfError] = useState<string | null>(null)
   const { system_name, agent_id, category, decision, consensus, expert_reports,
           final_rationale, key_conditions, submitted_at, description, council_critiques } = eval_
 
@@ -35,6 +38,23 @@ const FinalReport: FC<Props> = ({ evaluation }) => {
     URL.revokeObjectURL(url)
   }
 
+  const handleDownloadPdf = async () => {
+    if (!eval_.incident_id) {
+      setPdfError('No incident ID — PDF only available for real evaluations (not mock data).')
+      return
+    }
+    hapticButton()
+    setPdfError(null)
+    setPdfLoading(true)
+    try {
+      await downloadEvaluationPdf(eval_.incident_id)
+    } catch (e) {
+      setPdfError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setPdfLoading(false)
+    }
+  }
+
   return (
     <div className="p-8 space-y-8 animate-fade-in max-w-4xl">
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -42,9 +62,17 @@ const FinalReport: FC<Props> = ({ evaluation }) => {
           <h1 className="text-2xl font-bold text-apple-gray-900 mb-1">Full Assessment Report</h1>
           <p className="text-sm text-apple-gray-400">UNICC AI Safety Council · Complete pipeline from expert analysis to arbitration</p>
         </div>
-        <div className="flex gap-2">
-          <button className="btn-secondary text-xs" onClick={handleDownloadMarkdown}>↓ Export Markdown</button>
+        <div className="flex gap-2 flex-wrap">
+          <button className="btn-secondary text-xs" onClick={handleDownloadMarkdown}>↓ Markdown</button>
+          <button
+            className={`btn-primary text-xs ${pdfLoading ? 'opacity-60 pointer-events-none' : ''}`}
+            onClick={handleDownloadPdf}
+            disabled={pdfLoading}
+          >
+            {pdfLoading ? 'Generating…' : '↓ PDF'}
+          </button>
         </div>
+        {pdfError && <p className="text-xs text-apple-red mt-1 w-full">{pdfError}</p>}
       </div>
 
       {/* 0. System under evaluation */}

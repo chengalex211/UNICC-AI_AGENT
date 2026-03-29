@@ -38,6 +38,7 @@ export interface CouncilCritique {
 }
 
 export interface DetailedEvaluation {
+  incident_id?: string
   agent_id: string
   system_name: string
   category: string
