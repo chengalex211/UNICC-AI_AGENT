@@ -156,6 +156,40 @@ export async function analyzeRepo(
   return res.json()
 }
 
+export interface AuditEvent {
+  event_id: string
+  incident_id: string | null
+  stage: string
+  status: string
+  actor: string
+  severity: string
+  message: string
+  created_at: string
+  payload?: Record<string, unknown>
+}
+
+export interface AuditSpan {
+  span_id: string
+  span_name: string
+  actor: string
+  status: string
+  started_at: string
+  ended_at: string | null
+  duration_ms: number | null
+}
+
+export interface EvaluationAudit {
+  incident_id: string
+  events: AuditEvent[]
+  spans: AuditSpan[]
+}
+
+export async function getEvaluationAudit(incidentId: string): Promise<EvaluationAudit> {
+  const res = await fetch(`${BASE_URL}/evaluations/${incidentId}/audit`)
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
 /** 健康检查，用于判断后端是否可用 */
 export async function healthCheck(): Promise<boolean> {
   try {

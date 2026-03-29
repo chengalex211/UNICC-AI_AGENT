@@ -1,8 +1,10 @@
-import { type FC, useState } from 'react'
+import { type FC, useState, useCallback } from 'react'
 import { detailedEval, type DetailedEvaluation, type ExpertReport } from '../data/mockData'
 import { RecBadge } from '../components/Badge'
 import { hapticSelect } from '../utils/haptic'
+import { getEvaluationAudit, type AuditEvent, type AuditSpan } from '../api/client'
 
+// ── Score bar row ─────────────────────────────────────────────────────────────
 const ScoreRow: FC<{ label: string; value: number; max: number }> = ({ label, value, max }) => {
   const pct = (value / max) * 100
   const color = pct >= 80 ? 'bg-apple-green' : pct >= 50 ? 'bg-apple-blue' : pct >= 30 ? 'bg-apple-orange' : 'bg-apple-red'
@@ -19,6 +21,7 @@ const ScoreRow: FC<{ label: string; value: number; max: number }> = ({ label, va
   )
 }
 
+// ── Expert card ───────────────────────────────────────────────────────────────
 const ExpertCard: FC<{ report: ExpertReport; active: boolean; onClick: () => void }> = ({ report, active, onClick }) => (
   <button
     onClick={() => { hapticSelect(); onClick() }}
@@ -34,6 +37,172 @@ const ExpertCard: FC<{ report: ExpertReport; active: boolean; onClick: () => voi
   </button>
 )
 
+// ── Severity color chip ───────────────────────────────────────────────────────
+const sevColor = (sev: string) => {
+  if (sev === 'ERROR' || sev === 'CRITICAL') return 'text-apple-red'
+  if (sev === 'WARN')  return 'text-apple-orange'
+  if (sev === 'DEBUG') return 'text-apple-gray-400'
+  return 'text-apple-green'
+}
+
+const actorLabel = (actor: string) =>
+  actor.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+
+// ── Audit Log panel ───────────────────────────────────────────────────────────
+const AuditPanel: FC<{ incidentId: string | undefined }> = ({ incidentId }) => {
+  const [open, setOpen]         = useState(false)
+  const [loading, setLoading]   = useState(false)
+  const [error, setError]       = useState<string | null>(null)
+  const [events, setEvents]     = useState<AuditEvent[]>([])
+  const [spans, setSpans]       = useState<AuditSpan[]>([])
+
+  const load = useCallback(async () => {
+    if (!incidentId) return
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await getEvaluationAudit(incidentId)
+      setEvents(data.events)
+      setSpans(data.spans)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setLoading(false)
+    }
+  }, [incidentId])
+
+  const toggle = () => {
+    hapticSelect()
+    if (!open && events.length === 0) void load()
+    setOpen(o => !o)
+  }
+
+  const totalMs = spans.reduce((acc, s) => acc + (s.duration_ms ?? 0), 0)
+
+  return (
+    <div className="card overflow-hidden">
+      {/* Header — always visible */}
+      <button
+        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-apple-gray-50 transition-colors"
+        onClick={toggle}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-apple-gray-400">Audit / Pipeline Log</span>
+          {events.length > 0 && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-apple-gray-100 text-apple-gray-500 font-semibold">
+              {events.length} events
+            </span>
+          )}
+          {totalMs > 0 && (
+            <span className="text-[10px] text-apple-gray-400">· {(totalMs / 1000).toFixed(1)}s total</span>
+          )}
+          {!incidentId && (
+            <span className="text-[10px] text-apple-gray-400 italic">mock data — not available</span>
+          )}
+        </div>
+        <span className="text-apple-gray-400 text-xs">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Expandable body */}
+      {open && (
+        <div className="border-t border-apple-gray-100">
+          {loading && (
+            <div className="flex items-center gap-2 px-5 py-4 text-xs text-apple-gray-400">
+              <div className="w-3 h-3 border border-apple-blue border-t-transparent rounded-full animate-spin" />
+              Loading audit log…
+            </div>
+          )}
+          {error && (
+            <p className="px-5 py-3 text-xs text-apple-red">{error}</p>
+          )}
+          {!loading && !error && events.length === 0 && (
+            <p className="px-5 py-3 text-xs text-apple-gray-400">No audit events found for this evaluation.</p>
+          )}
+
+          {/* Timing spans summary */}
+          {spans.length > 0 && (
+            <div className="px-5 py-3 border-b border-apple-gray-50 flex flex-wrap gap-3">
+              {spans.map(s => (
+                <div key={s.span_id} className="flex items-center gap-1.5 text-[11px]">
+                  <span className={`w-1.5 h-1.5 rounded-full ${s.status === 'success' ? 'bg-apple-green' : 'bg-apple-red'}`} />
+                  <span className="text-apple-gray-600 font-medium">{s.span_name.replace(/_/g, ' ')}</span>
+                  <span className="text-apple-gray-400">{s.duration_ms != null ? `${(s.duration_ms / 1000).toFixed(1)}s` : '—'}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Event list — terminal style */}
+          {events.length > 0 && (
+            <div className="bg-[#1c1c1e] rounded-b-apple mx-0 max-h-64 overflow-y-auto font-mono">
+              {events.map((ev, i) => (
+                <div
+                  key={ev.event_id}
+                  className={`flex gap-3 px-4 py-1.5 text-[11px] leading-relaxed
+                    ${i % 2 === 0 ? 'bg-transparent' : 'bg-white/[0.02]'}
+                    hover:bg-white/[0.05] transition-colors`}
+                >
+                  <span className="text-[#636366] shrink-0 select-none">
+                    {ev.created_at.slice(11, 19)}
+                  </span>
+                  <span className={`shrink-0 w-10 font-bold ${sevColor(ev.severity)}`}>
+                    {ev.severity.slice(0, 4)}
+                  </span>
+                  <span className="text-[#98989d] shrink-0 w-28 truncate">
+                    {actorLabel(ev.actor)}
+                  </span>
+                  <span className="text-[#e5e5ea] flex-1 min-w-0">
+                    {ev.message}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Collapsible description card ──────────────────────────────────────────────
+const DescriptionCard: FC<{ description: string }> = ({ description }) => {
+  const [expanded, setExpanded] = useState(false)
+  const PREVIEW_CHARS = 280
+  const isLong = description.length > PREVIEW_CHARS
+
+  return (
+    <div className="card overflow-hidden">
+      <button
+        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-apple-gray-50 transition-colors"
+        onClick={() => { hapticSelect(); setExpanded(e => !e) }}
+      >
+        <span className="text-[11px] font-bold uppercase tracking-wider text-apple-gray-400">
+          System Under Evaluation
+        </span>
+        {isLong && (
+          <span className="text-[11px] text-apple-blue">{expanded ? '▲ Collapse' : '▼ Expand'}</span>
+        )}
+      </button>
+      <div className="px-5 pb-4 border-t border-apple-gray-50">
+        <p className="text-sm text-apple-gray-700 leading-relaxed mt-3">
+          {isLong && !expanded
+            ? description.slice(0, PREVIEW_CHARS) + '…'
+            : description}
+        </p>
+        {isLong && (
+          <button
+            className="mt-2 text-xs text-apple-blue hover:underline"
+            onClick={() => { hapticSelect(); setExpanded(e => !e) }}
+          >
+            {expanded ? 'Show less' : 'Show full description'}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
 interface Props { evaluation?: DetailedEvaluation | null }
 
 const ExpertAnalysis: FC<Props> = ({ evaluation }) => {
@@ -52,10 +221,10 @@ const ExpertAnalysis: FC<Props> = ({ evaluation }) => {
         <RecBadge rec={eval_.decision} />
       </div>
 
-      {/* System description */}
-      <div className="card p-5">
-        <p className="section-label">System Under Evaluation</p>
-        <p className="text-sm text-apple-gray-700 leading-relaxed">{eval_.description}</p>
+      {/* Description + Audit Log — side by side */}
+      <div className="grid grid-cols-2 gap-4">
+        <DescriptionCard description={eval_.description} />
+        <AuditPanel incidentId={eval_.incident_id} />
       </div>
 
       {/* Expert selector */}

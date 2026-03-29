@@ -643,6 +643,18 @@ def get_evaluation_pdf(incident_id: str) -> Response:
     )
 
 
+@app.get("/evaluations/{incident_id}/audit")
+def get_evaluation_audit(incident_id: str) -> dict:
+    """Return audit events + timing spans for a single evaluation run."""
+    try:
+        from council.audit import list_events, list_spans
+        events = list_events(incident_id=incident_id, limit=200)
+        spans  = list_spans(incident_id=incident_id,  limit=50)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {"incident_id": incident_id, "events": events, "spans": spans}
+
+
 @app.get("/knowledge/index")
 def get_knowledge_index(limit: int = Query(default=20, ge=1, le=500)) -> dict:
     if not INDEX_PATH.exists():
