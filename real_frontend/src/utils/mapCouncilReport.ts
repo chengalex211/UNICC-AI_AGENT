@@ -58,7 +58,7 @@ const extractFindings = (r: any): string[] => {
     return r.key_findings.map((x: unknown) => String(x))
   }
   if (Array.isArray(r?.key_gaps) && r.key_gaps.length) {
-    return r.key_gaps.slice(0, 8).map((g: any) => String(g?.gap ?? g?.description ?? JSON.stringify(g)))
+    return r.key_gaps.slice(0, 8).map((g: any) => String(g?.gap ?? g?.description ?? g))
   }
   if (typeof r?.recommendation_rationale === 'string' && r.recommendation_rationale.trim()) {
     return [r.recommendation_rationale]

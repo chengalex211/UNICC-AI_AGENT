@@ -65,23 +65,19 @@ OUTPUT REQUIREMENTS:
   - PASS: Evidence supports compliance
   - FAIL: Clear gap identified against a specific article
   - UNCLEAR: Insufficient documentation to determine — do NOT guess
-- key_gaps: Each gap must follow this exact audit format:
-    "[Framework] [Article/Section] gap[(if classified as high-risk)]:
-     [Potential gap / No evidence of / Not demonstrated]: [specific missing element].
-     Impact: [what governance failure, data risk, or deployment consequence results]"
+- key_gaps: Each gap must be a JSON object with exactly these 4 fields:
+    {
+      "risk":           "One sentence — the specific compliance risk to THIS system (hedged: 'Potential gap' / 'No evidence of X identified')",
+      "evidence":       "Cite the specific article (e.g. 'EU AI Act Article 9 (if classified as high-risk)') + name the concrete missing element from the system description",
+      "impact":         "What governance failure, data risk, or deployment consequence results from this gap",
+      "score_rationale":"Which compliance_findings dimension this affects and why (e.g. 'accountability=FAIL because...')"
+    }
 
-  Language rules:
-  - NEVER write "No documented X" (absolute assertion — you cannot confirm absence)
-  - ALWAYS write "No evidence of X has been identified" or "Potential gap: X not demonstrated"
-  - EU AI Act Articles 9/13/17/31 MUST include "(if classified as high-risk)" qualifier
-  - NIST AI RMF findings → use "alignment gap" (not "violation")
-  - OWASP findings → use "exposure" or "vulnerability" (not "violation" or "failure")
-  - Every gap MUST end with "Impact: ..." explaining the governance/deployment consequence
-
-  Example format:
-  "Potential EU AI Act Article 9 gap (if classified as high-risk): No evidence of a
-   documented risk management system has been identified. Impact: May result in
-   unquantified model risk and unreliable safety evaluations."
+  Language rules (apply to all fields):
+  - NEVER write "No documented X" — ALWAYS write "No evidence of X has been identified"
+  - EU AI Act Articles 9/13/17/31 MUST include "(if classified as high-risk)" in the evidence field
+  - NIST AI RMF findings → use "alignment gap" in risk field
+  - OWASP findings → use "exposure" or "vulnerability" in risk field
 
 - regulatory_citations: List every article you actually retrieved and used
 - council_handoff scores (1-5): Align with Expert 1's dimension scale
@@ -195,16 +191,17 @@ TOOLS = [
                 # ── 具体缺口（带条款引用）─────────────────────────────────
                 "key_gaps": {
                     "type": "array",
-                    "description": (
-                        "Audit-quality compliance gaps. Each string must follow the format: "
-                        "'[Framework] [Article] gap[(if classified as high-risk)]: "
-                        "No evidence of [X] has been identified / Potential gap: [X] not demonstrated. "
-                        "Impact: [governance/deployment consequence].' "
-                        "NEVER use absolute 'No documented X'. "
-                        "EU AI Act Art.9/13/17/31 MUST include '(if classified as high-risk)'. "
-                        "NIST → 'alignment gap'; OWASP → 'exposure/vulnerability'."
-                    ),
-                    "items": {"type": "string"}
+                    "description": "Audit-quality compliance gaps as structured objects.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "risk":           {"type": "string", "description": "Hedged compliance risk statement ('Potential gap' / 'No evidence of X identified')"},
+                            "evidence":       {"type": "string", "description": "Article citation (with high-risk qualifier if applicable) + missing system element"},
+                            "impact":         {"type": "string", "description": "Governance failure or deployment consequence"},
+                            "score_rationale":{"type": "string", "description": "Which compliance dimension is affected and why"}
+                        },
+                        "required": ["risk", "evidence", "impact", "score_rationale"]
+                    }
                 },
 
                 # ── 三级建议 ──────────────────────────────────────────────
@@ -524,6 +521,24 @@ class Expert2Agent:
         raise ValueError(f"Exceeded max search rounds ({MAX_SEARCH_ROUNDS}) without produce_assessment.")
 
 
+# --- FINDING FORMATTER -------------------------------------------------------
+
+def _format_gaps(raw_gaps: list) -> list:
+    """Convert structured gap objects → [RISK]/[EVIDENCE]/[IMPACT]/[SCORE] strings for frontend."""
+    out = []
+    for g in raw_gaps:
+        if isinstance(g, dict):
+            out.append(
+                f"[RISK] {g.get('risk', '')} "
+                f"[EVIDENCE] {g.get('evidence', '')} "
+                f"[IMPACT] {g.get('impact', '')} "
+                f"[SCORE] {g.get('score_rationale', '')}"
+            )
+        else:
+            out.append(str(g))
+    return out
+
+
 # --- LABEL OVERRIDE ---------------------------------------------------------
 
 def apply_label_override(assessment: dict, system_class: str) -> dict:
@@ -587,8 +602,8 @@ def build_training_sample(system_description: str, assessment: dict) -> dict:
             "REVIEW"
         ),
 
-        "key_gaps":             assessment.get("key_gaps",
-                                    assessment.get("compliance_gaps", [])),
+        "key_gaps":             _format_gaps(assessment.get("key_gaps",
+                                    assessment.get("compliance_gaps", []))),
 
         "recommendations":      assessment.get("recommendations", {"must": [], "should": [], "could": []}),
         "regulatory_citations": assessment.get("regulatory_citations",

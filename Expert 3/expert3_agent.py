@@ -85,6 +85,15 @@ SCORING PRINCIPLES:
 - key_findings must reference specific text from the system description, not generic statements
 - un_principle_violations must name the exact principle and why it is violated
 
+KEY FINDINGS FORMAT — each finding must be a JSON object with exactly these 4 fields:
+  {
+    "risk":           "One sentence — what is the specific UN/humanitarian risk to THIS system",
+    "evidence":       "Quote or cite the exact system characteristic that creates this risk + name the UN principle violated",
+    "impact":         "What harm could result — affected population, operational consequence, or mission failure",
+    "score_rationale":"Why the most-affected dimension received its score (e.g. 'societal_risk=4 because...')"
+  }
+Do NOT write generic statements. Every field must be grounded in specific text from the system description.
+
 PROCESS:
 1. Read the system description carefully
 2. Search the UN principles knowledge base (up to 3 searches)
@@ -178,13 +187,21 @@ TOOLS = [
                 },
                 "key_findings": {
                     "type": "array",
-                    "items": {"type": "string"},
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "risk":           {"type": "string", "description": "Specific UN/humanitarian risk to THIS system"},
+                            "evidence":       {"type": "string", "description": "Exact system characteristic + UN principle cited"},
+                            "impact":         {"type": "string", "description": "Harm to affected population or mission consequence"},
+                            "score_rationale":{"type": "string", "description": "Why the dimension score is what it is"}
+                        },
+                        "required": ["risk", "evidence", "impact", "score_rationale"]
+                    },
                     "description": (
-                        "3-6 specific findings grounded in the system description. "
-                        "Each finding must reference specific system characteristics "
-                        "and cite the relevant UN principle. "
-                        "Example: 'Black-box ML model violates UNESCO AI Ethics §47 "
-                        "(transparency) — caseworkers cannot explain allocation decisions to refugees.'"
+                        "3-5 audit-quality findings as structured objects. "
+                        "Each must bind a specific system characteristic to a UN/humanitarian principle "
+                        "and state the concrete impact. "
+                        "Do NOT write generic descriptions — cite exact text from the system description."
                     )
                 },
                 "un_principle_violations": {
@@ -371,6 +388,22 @@ def derive_council_handoff(raw: dict) -> dict:
 
 # ── OUTPUT FORMATTER ──────────────────────────────────────────────────────────
 
+def _format_findings(raw_findings: list) -> list:
+    """Convert structured finding objects → [RISK]/[EVIDENCE]/[IMPACT]/[SCORE] strings for frontend rendering."""
+    out = []
+    for f in raw_findings:
+        if isinstance(f, dict):
+            out.append(
+                f"[RISK] {f.get('risk', '')} "
+                f"[EVIDENCE] {f.get('evidence', '')} "
+                f"[IMPACT] {f.get('impact', '')} "
+                f"[SCORE] {f.get('score_rationale', '')}"
+            )
+        else:
+            out.append(str(f))
+    return out
+
+
 def format_final_output(raw: dict, agent_id: str, session_id: str) -> dict:
     """
     Converts produce_assessment raw output into standard Expert3Report.
@@ -405,7 +438,7 @@ def format_final_output(raw: dict, agent_id: str, session_id: str) -> dict:
         "dimension_scores":        scores,
         "risk_tier":               risk_tier,
         "human_review_required":   human_review,
-        "key_findings":            raw.get("key_findings", []),
+        "key_findings":            _format_findings(raw.get("key_findings", [])),
         "un_principle_violations": raw.get("un_principle_violations", []),
         "recommendation":          raw.get("recommendation", "REVIEW"),
         "narrative":               raw.get("narrative", ""),
