@@ -192,6 +192,13 @@ export interface EvaluationAudit {
   spans: AuditSpan[]
 }
 
+export async function getRecentAudit(limit = 30): Promise<AuditEvent[]> {
+  const res = await fetch(`${BASE_URL}/audit/recent?limit=${limit}`)
+  if (!res.ok) throw new Error(await res.text())
+  const data = await res.json()
+  return data.events ?? []
+}
+
 export async function getEvaluationAudit(incidentId: string): Promise<EvaluationAudit> {
   const res = await fetch(`${BASE_URL}/evaluations/${incidentId}/audit`)
   if (!res.ok) throw new Error(await res.text())

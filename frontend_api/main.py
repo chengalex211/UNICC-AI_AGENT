@@ -700,6 +700,16 @@ def get_evaluation_pdf(incident_id: str) -> Response:
     )
 
 
+@app.get("/audit/recent")
+def get_recent_audit(limit: int = Query(default=30, ge=1, le=100)) -> dict:
+    """Return the most recent audit events across all sessions (for live polling)."""
+    try:
+        events = audit_list_events(limit=limit)
+        return {"events": events}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/evaluations/{incident_id}/audit")
 def get_evaluation_audit(incident_id: str) -> dict:
     """Return audit events + timing spans for a single evaluation run."""

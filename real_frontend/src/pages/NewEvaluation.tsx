@@ -1,6 +1,6 @@
-import { type FC, useState, useRef } from 'react'
+import { type FC, useState, useRef, useEffect } from 'react'
 import { hapticButton, hapticSelect } from '../utils/haptic'
-import { submitCouncilEvaluation, analyzeRepo, type CouncilReportResponse } from '../api/client'
+import { submitCouncilEvaluation, analyzeRepo, getRecentAudit, type CouncilReportResponse, type AuditEvent } from '../api/client'
 import { parseAgentDoc } from '../utils/parseAgentDoc'
 
 interface Props {
@@ -27,6 +27,10 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
   const [step, setStep]         = useState<1 | 2>(1)
   const [loading, setLoading]   = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [liveLog, setLiveLog]   = useState<AuditEvent[]>([])
+  const [logOpen, setLogOpen]   = useState(true)
+  const logEndRef               = useRef<HTMLDivElement>(null)
+  const pollRef                 = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const [form, setForm] = useState({
     system_name: '', agent_id: '', category: '', deploy_zone: '',
@@ -97,9 +101,28 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
     }
   }
 
+  // Auto-scroll log to bottom when new events arrive
+  useEffect(() => {
+    if (loading && logOpen) logEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [liveLog, loading, logOpen])
+
+  const startPolling = () => {
+    setLiveLog([])
+    pollRef.current = setInterval(async () => {
+      try {
+        const events = await getRecentAudit(30)
+        setLiveLog(events)
+      } catch { /* ignore poll errors */ }
+    }, 1500)
+  }
+  const stopPolling = () => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+  }
+
   const handleSubmit = async () => {
     setSubmitError(null)
     setLoading(true)
+    startPolling()
     try {
       const payload: Parameters<typeof submitCouncilEvaluation>[0] = {
         agent_id: form.agent_id,
@@ -114,8 +137,12 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
         vllm_model: import.meta.env.VITE_VLLM_MODEL || 'meta-llama/Meta-Llama-3-70B-Instruct',
       }
       const report = await submitCouncilEvaluation(payload)
+      stopPolling()
+      // Final poll to capture completion events
+      try { setLiveLog(await getRecentAudit(30)) } catch { /* ignore */ }
       onSubmit(report)
     } catch (e) {
+      stopPolling()
       setSubmitError(e instanceof Error ? e.message : String(e))
     } finally {
       setLoading(false)
@@ -383,9 +410,57 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
             )}
 
             {loading && (
-              <div className="flex flex-col items-center py-6 gap-3">
-                <div className="w-8 h-8 border-2 border-apple-blue border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-apple-gray-500">Running Council evaluation (3 Experts + Critiques + Arbitration)…</p>
+              <div className="space-y-4">
+                <div className="flex flex-col items-center py-4 gap-3">
+                  <div className="w-8 h-8 border-2 border-apple-blue border-t-transparent rounded-full animate-spin" />
+                  <p className="text-sm text-apple-gray-500">Running Council evaluation (3 Experts + Critiques + Arbitration)…</p>
+                </div>
+
+                {/* Live audit log */}
+                <div className="rounded-apple border border-apple-gray-100 overflow-hidden">
+                  <button
+                    className="w-full flex items-center justify-between px-4 py-2.5 bg-apple-gray-50 hover:bg-apple-gray-100 transition-colors"
+                    onClick={() => setLogOpen(o => !o)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-apple-gray-400">Live Pipeline Log</span>
+                      {liveLog.length > 0 && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-apple-blue text-white font-semibold animate-pulse">
+                          {liveLog.length} events
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-apple-gray-400 text-xs">{logOpen ? '▲' : '▼'}</span>
+                  </button>
+
+                  {logOpen && (
+                    <div className="bg-[#1c1c1e] max-h-48 overflow-y-auto font-mono">
+                      {liveLog.length === 0 ? (
+                        <div className="flex items-center gap-2 px-4 py-3 text-[11px] text-[#636366]">
+                          <div className="w-2 h-2 rounded-full bg-apple-blue animate-pulse" />
+                          Waiting for pipeline events…
+                        </div>
+                      ) : (
+                        liveLog.map((ev, i) => (
+                          <div key={ev.event_id}
+                            className={`flex gap-3 px-4 py-1.5 text-[11px] leading-relaxed
+                              ${i % 2 === 0 ? '' : 'bg-white/[0.02]'}`}>
+                            <span className="text-[#636366] shrink-0">{ev.created_at.slice(11, 19)}</span>
+                            <span className={`shrink-0 w-10 font-bold ${
+                              ev.severity === 'ERROR' ? 'text-apple-red' :
+                              ev.severity === 'WARN'  ? 'text-apple-orange' : 'text-apple-green'
+                            }`}>{ev.severity.slice(0,4)}</span>
+                            <span className="text-[#98989d] shrink-0 w-24 truncate">
+                              {ev.actor.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}
+                            </span>
+                            <span className="text-[#e5e5ea] flex-1 min-w-0">{ev.message}</span>
+                          </div>
+                        ))
+                      )}
+                      <div ref={logEndRef} />
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
