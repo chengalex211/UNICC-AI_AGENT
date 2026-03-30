@@ -183,7 +183,7 @@ def run_batch(backend: str, dry_run: bool):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--backend",  default="claude", choices=["claude", "vllm"])
+    parser.add_argument("--backend",  default="vllm", choices=["claude", "vllm"])
     parser.add_argument("--dry-run",  action="store_true", help="Analyze repos only, skip evaluation")
     args = parser.parse_args()
 

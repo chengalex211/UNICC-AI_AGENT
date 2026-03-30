@@ -2,6 +2,13 @@
 # Entry point for DGX runner / CI
 # Setup:  pip install -r requirements.txt
 # Run:    bash start.sh
+#
+# LLM backend priority (auto-detected at request time, no restart needed):
+#   1. vLLM   — if running at http://localhost:8000  (DGX local model, no API key needed)
+#   2. Claude — fallback if ANTHROPIC_API_KEY is set  (cloud, set env var below)
+#
+# To use Claude fallback:
+#   export ANTHROPIC_API_KEY=sk-ant-...
 set -e
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
