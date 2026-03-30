@@ -4,7 +4,6 @@ import Dashboard from './pages/Dashboard'
 import NewEvaluation from './pages/NewEvaluation'
 import Report from './pages/Report'
 import type { ReportStep } from './pages/Report'
-import ReportFullPage from './pages/ReportFullPage'
 import {
   getEvaluationByIncident,
   listEvaluations,
@@ -14,7 +13,7 @@ import {
 import { councilReportToDetailedEvaluation } from './utils/mapCouncilReport'
 import type { DetailedEvaluation } from './data/mockData'
 
-type Page = 'dashboard' | 'evaluate' | 'report' | 'fullreport'
+type Page = 'dashboard' | 'evaluate' | 'report'
 
 function App() {
   const [page, setPage] = useState<Page>('dashboard')
@@ -46,11 +45,6 @@ function App() {
     setPage('report')
   }
 
-  const openFullReport = (id: string) => {
-    setReportId(id)
-    setPage('fullreport')
-  }
-
   const handleSelectEval = async (incidentId: string) => {
     try {
       const report = await getEvaluationByIncident(incidentId)
@@ -67,16 +61,6 @@ function App() {
     setCurrentEvaluation(councilReportToDetailedEvaluation(report))
     void loadHistory()
     openReport(report.incident_id)
-  }
-
-  // Full-page standalone view — no sidebar
-  if (page === 'fullreport' && reportId) {
-    return (
-      <ReportFullPage
-        incidentId={reportId}
-        onBack={() => setPage('report')}
-      />
-    )
   }
 
   return (
@@ -109,7 +93,6 @@ function App() {
             onStepChange={setReportStep}
             evaluation={currentEvaluation}
             councilReport={currentReport}
-            onViewFull={() => openFullReport(reportId)}
           />
         )}
       </main>
