@@ -49,7 +49,7 @@ _COUNCIL_DIR  = os.path.dirname(os.path.abspath(__file__))
 _CAPSTONE_DIR = os.path.dirname(_COUNCIL_DIR)
 
 _EXPERT_PATHS = [
-    os.path.join(_CAPSTONE_DIR, "unicc-ai-agent Team 1 Expert 1"),
+    os.path.join(_CAPSTONE_DIR, "Expert1"),
     os.path.join(_CAPSTONE_DIR, "Expert 2"),
     os.path.join(_CAPSTONE_DIR, "Expert 3"),
 ]
