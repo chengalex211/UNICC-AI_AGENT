@@ -240,8 +240,34 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
                 className="input-field resize-none h-28"
                 placeholder="Describe what this AI system does…"
                 value={form.description}
-                onChange={set('description')}
+                onChange={e => { setForm(f => ({ ...f, description: e.target.value })); setAutoFilled(false) }}
               />
+              {/* Paste mode: offer to analyze text for auto-fill */}
+              {inputMode === 'paste' && form.description.trim().length > 80 && !autoFilled && (
+                <div className="flex items-center gap-3 mt-1.5">
+                  <button
+                    type="button"
+                    className={`btn-secondary text-xs ${analyzing ? 'opacity-40 pointer-events-none' : ''}`}
+                    onClick={async () => {
+                      hapticButton()
+                      setAnalyzeError(null)
+                      setAnalyzing(true)
+                      try {
+                        const result = await analyzeRepo({ text: form.description, backend: defaultBackend() })
+                        applyResult(result)
+                      } catch (e) {
+                        setAnalyzeError(e instanceof Error ? e.message : String(e))
+                      } finally {
+                        setAnalyzing(false)
+                      }
+                    }}
+                    disabled={analyzing}
+                  >
+                    {analyzing ? 'Analyzing…' : '✦ Auto-fill from this text'}
+                  </button>
+                  <span className="text-[11px] text-apple-gray-400">Fills category, zone & capabilities automatically</span>
+                </div>
+              )}
             </div>
 
             {/* Capabilities */}
