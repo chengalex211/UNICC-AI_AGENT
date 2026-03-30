@@ -199,6 +199,25 @@ export async function getRecentAudit(limit = 30): Promise<AuditEvent[]> {
   return data.events ?? []
 }
 
+export interface KnowledgeStatExpert {
+  key: string
+  label: string
+  description: string
+  doc_count: number
+  status: string
+}
+
+export interface KnowledgeStats {
+  experts: KnowledgeStatExpert[]
+  cases_indexed: number
+}
+
+export async function getKnowledgeStats(): Promise<KnowledgeStats> {
+  const res = await fetch(`${BASE_URL}/knowledge/stats`)
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
 export async function getEvaluationAudit(incidentId: string): Promise<EvaluationAudit> {
   const res = await fetch(`${BASE_URL}/evaluations/${incidentId}/audit`)
   if (!res.ok) throw new Error(await res.text())

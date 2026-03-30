@@ -1,5 +1,6 @@
-import { type FC } from 'react'
-import type { EvaluationListItem } from '../api/client'
+import { type FC, useEffect, useState } from 'react'
+import type { EvaluationListItem, KnowledgeStats } from '../api/client'
+import { getKnowledgeStats } from '../api/client'
 import { RecBadge, ConsensusBadge } from '../components/Badge'
 import { hapticSelect } from '../utils/haptic'
 
@@ -17,59 +18,57 @@ const StatCard: FC<{ label: string; value: number | string; sub?: string; accent
   </div>
 )
 
-const DonutRing: FC<{ approve: number; review: number; reject: number; total: number }> = ({ approve, review, reject, total }) => {
-  const r = 40
-  const circ = 2 * Math.PI * r
-  const a = (approve / total) * circ
-  const rv = (review / total) * circ
-  const rej = (reject / total) * circ
-  return (
-    <svg viewBox="0 0 100 100" className="w-28 h-28 -rotate-90">
-      <circle cx="50" cy="50" r={r} fill="none" stroke="#f5f5f7" strokeWidth="12" />
-      <circle cx="50" cy="50" r={r} fill="none" stroke="#34c759" strokeWidth="12"
-        strokeDasharray={`${a} ${circ - a}`} strokeLinecap="round" />
-      <circle cx="50" cy="50" r={r} fill="none" stroke="#ff9500" strokeWidth="12"
-        strokeDasharray={`${rv} ${circ - rv}`} strokeDashoffset={-a} strokeLinecap="round" />
-      <circle cx="50" cy="50" r={r} fill="none" stroke="#ff3b30" strokeWidth="12"
-        strokeDasharray={`${rej} ${circ - rej}`} strokeDashoffset={-(a + rv)} strokeLinecap="round" />
-    </svg>
-  )
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h / 24)}d ago`
 }
 
-/** Pairwise agreement %: rows where both experts have a non-null rec that matches */
-const pairAgreement = (
-  rows: { a: string | null | undefined; b: string | null | undefined }[]
-): number => {
-  const both = rows.filter(r => r.a && r.b)
-  if (both.length === 0) return 0
-  const agree = both.filter(r => r.a === r.b).length
-  return Math.round((agree / both.length) * 100)
+const decisionColor: Record<string, string> = {
+  APPROVE: 'text-apple-green',
+  REVIEW:  'text-apple-orange',
+  REJECT:  'text-apple-red',
+}
+const decisionDot: Record<string, string> = {
+  APPROVE: 'bg-apple-green',
+  REVIEW:  'bg-apple-orange',
+  REJECT:  'bg-apple-red',
 }
 
 const Dashboard: FC<Props> = ({ onSelect, onNewEvaluation, evaluations }) => {
-  const total = Math.max(evaluations.length, 1)
-  const approved = evaluations.filter(e => e.decision === 'APPROVE').length
-  const review = evaluations.filter(e => e.decision === 'REVIEW').length
-  const rejected = evaluations.filter(e => e.decision === 'REJECT').length
-  const fullConsensus = evaluations.filter(e => e.consensus === 'FULL').length
-  const partialConsensus = evaluations.filter(e => e.consensus === 'PARTIAL').length
-  const splitConsensus = evaluations.filter(e => e.consensus === 'SPLIT').length
+  const [kbStats, setKbStats] = useState<KnowledgeStats | null>(null)
 
-  // Pairwise expert agreement — uses real rec_* columns from the API
-  const hasExpertRecs = evaluations.some(e => e.rec_security || e.rec_governance || e.rec_un_mission)
-  const e1e2 = pairAgreement(evaluations.map(e => ({ a: e.rec_security,   b: e.rec_governance })))
-  const e2e3 = pairAgreement(evaluations.map(e => ({ a: e.rec_governance, b: e.rec_un_mission })))
-  const e1e3 = pairAgreement(evaluations.map(e => ({ a: e.rec_security,   b: e.rec_un_mission })))
-  const triAll = pairAgreement(
-    evaluations.map(e => ({
-      a: (e.rec_security && e.rec_governance && e.rec_security === e.rec_governance) ? e.rec_security : null,
-      b: e.rec_un_mission,
-    }))
-  )
+  useEffect(() => {
+    getKnowledgeStats().then(setKbStats).catch(() => {})
+  }, [])
+
+  const total    = Math.max(evaluations.length, 1)
+  const approved = evaluations.filter(e => e.decision === 'APPROVE').length
+  const review   = evaluations.filter(e => e.decision === 'REVIEW').length
+  const rejected = evaluations.filter(e => e.decision === 'REJECT').length
+
+  // Per-expert risk signals
+  const recCounts = (field: 'rec_security' | 'rec_governance' | 'rec_un_mission') => ({
+    APPROVE: evaluations.filter(e => e[field] === 'APPROVE').length,
+    REVIEW:  evaluations.filter(e => e[field] === 'REVIEW').length,
+    REJECT:  evaluations.filter(e => e[field] === 'REJECT').length,
+  })
+  const expertSignals = [
+    { label: 'Expert 1', sub: 'Security',    counts: recCounts('rec_security') },
+    { label: 'Expert 2', sub: 'Governance',  counts: recCounts('rec_governance') },
+    { label: 'Expert 3', sub: 'UN Mission',  counts: recCounts('rec_un_mission') },
+  ]
+  const hasRecs = evaluations.some(e => e.rec_security || e.rec_governance || e.rec_un_mission)
+
+  const recent5 = evaluations.slice(0, 5)
 
   return (
     <div className="p-8 space-y-8 animate-fade-in">
-      {/* Header + primary CTA */}
+      {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-apple-gray-900 mb-1">Overview</h1>
@@ -83,99 +82,151 @@ const Dashboard: FC<Props> = ({ onSelect, onNewEvaluation, evaluations }) => {
         </button>
       </div>
 
-      {/* Stats */}
+      {/* Stats row */}
       <div className="grid grid-cols-4 gap-4">
-        <StatCard label="Total Evaluated" value={total} sub="AI systems submitted" />
-        <StatCard label="Approved" value={approved} sub={`${Math.round(approved/total*100)}% of submissions`} accent="text-apple-green" />
-        <StatCard label="Needs Review" value={review} sub={`${Math.round(review/total*100)}% of submissions`} accent="text-apple-orange" />
-        <StatCard label="Rejected" value={rejected} sub={`${Math.round(rejected/total*100)}% of submissions`} accent="text-apple-red" />
+        <StatCard label="Total Evaluated"  value={evaluations.length} sub="AI systems submitted" />
+        <StatCard label="Approved"         value={approved}  sub={`${Math.round(approved/total*100)}% of submissions`}  accent="text-apple-green" />
+        <StatCard label="Needs Review"     value={review}    sub={`${Math.round(review/total*100)}% of submissions`}    accent="text-apple-orange" />
+        <StatCard label="Rejected"         value={rejected}  sub={`${Math.round(rejected/total*100)}% of submissions`}  accent="text-apple-red" />
       </div>
 
+      {/* 3-panel row */}
       <div className="grid grid-cols-3 gap-6">
-        {/* Donut chart */}
-        <div className="card p-6 flex flex-col items-center justify-center col-span-1">
-          <p className="section-label w-full text-center">Decision Distribution</p>
-          <div className="relative">
-            <DonutRing approve={approved} review={review} reject={rejected} total={total} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-xl font-bold text-apple-gray-900">{total}</span>
-              <span className="text-[10px] text-apple-gray-400">total</span>
+
+        {/* Panel 1 — Recent Evaluations */}
+        <div className="card p-6 flex flex-col gap-3">
+          <p className="section-label">Recent Evaluations</p>
+          {recent5.length === 0 ? (
+            <p className="text-xs text-apple-gray-400 mt-2">No evaluations yet.</p>
+          ) : (
+            <div className="space-y-2.5 flex-1">
+              {recent5.map(ev => (
+                <button
+                  key={ev.incident_id}
+                  onClick={() => { hapticSelect(); onSelect(ev.incident_id) }}
+                  className="w-full flex items-center justify-between gap-2 group text-left
+                    hover:bg-apple-gray-50 rounded-apple px-2 py-1.5 -mx-2 transition-colors"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${decisionDot[ev.decision] ?? 'bg-apple-gray-300'}`} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-apple-gray-900 truncate leading-tight">
+                        {ev.system_name}
+                      </p>
+                      <p className="text-[11px] text-apple-gray-400 truncate">{ev.agent_id}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end shrink-0 gap-0.5">
+                    <span className={`text-xs font-semibold ${decisionColor[ev.decision] ?? ''}`}>
+                      {ev.decision}
+                    </span>
+                    <span className="text-[10px] text-apple-gray-400">{timeAgo(ev.created_at)}</span>
+                  </div>
+                </button>
+              ))}
             </div>
-          </div>
-          <div className="flex gap-4 mt-4">
-            {[['#34c759','Approve'],['#ff9500','Review'],['#ff3b30','Reject']].map(([c,l]) => (
-              <div key={l} className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full" style={{ background: c }} />
-                <span className="text-[11px] text-apple-gray-500">{l}</span>
-              </div>
-            ))}
-          </div>
+          )}
+          {evaluations.length > 5 && (
+            <p className="text-[11px] text-apple-gray-400 pt-1 border-t border-apple-gray-100">
+              +{evaluations.length - 5} more below
+            </p>
+          )}
         </div>
 
-        {/* Consensus + avg time */}
-        <div className="card p-6 col-span-1 flex flex-col justify-between">
-          <p className="section-label">Council Consensus</p>
-          <div className="space-y-4 flex-1">
-            {[
-              { label: 'Full Consensus', value: fullConsensus, color: 'bg-apple-blue', total },
-              { label: 'Partial Consensus', value: partialConsensus, color: 'bg-apple-orange', total },
-              { label: 'No Consensus', value: splitConsensus, color: 'bg-apple-red', total },
-            ].map(row => (
-              <div key={row.label}>
-                <div className="flex justify-between mb-1.5">
-                  <span className="text-xs text-apple-gray-600">{row.label}</span>
-                  <span className="text-xs font-semibold text-apple-gray-900">{row.value}</span>
-                </div>
-                <div className="score-bar">
-                  <div className={`score-fill ${row.color}`} style={{ width: `${(row.value / total) * 100}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-5 pt-4 border-t border-apple-gray-100">
-            <p className="text-xs text-apple-gray-400 mb-0.5">Recent Incidents</p>
-            <p className="text-2xl font-bold text-apple-gray-900">{evaluations.length}</p>
-          </div>
-        </div>
-
-        {/* Expert agreement matrix */}
-        <div className="card p-6 col-span-1">
-          <p className="section-label">Expert Alignment</p>
-          {!hasExpertRecs ? (
-            <p className="text-xs text-apple-gray-400 mt-3">
-              No expert-level data yet — submit evaluations to populate.
+        {/* Panel 2 — Expert Risk Signals */}
+        <div className="card p-6 flex flex-col gap-3">
+          <p className="section-label">Expert Risk Signals</p>
+          {!hasRecs ? (
+            <p className="text-xs text-apple-gray-400 mt-2">
+              Submit evaluations to see per-expert breakdown.
             </p>
           ) : (
-            <div className="space-y-3 mt-1">
-              {[
-                { label: 'Security × Governance', pct: e1e2 },
-                { label: 'Governance × UN Mission', pct: e2e3 },
-                { label: 'Security × UN Mission', pct: e1e3 },
-                { label: 'Full Tri-Agreement', pct: triAll },
-              ].map(row => (
-                <div key={row.label}>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs text-apple-gray-600">{row.label}</span>
-                    <span className="text-xs font-semibold text-apple-gray-900">{row.pct}%</span>
+            <div className="space-y-4 flex-1">
+              {expertSignals.map(ex => {
+                const rowTotal = ex.counts.APPROVE + ex.counts.REVIEW + ex.counts.REJECT || 1
+                return (
+                  <div key={ex.label}>
+                    <div className="flex items-baseline justify-between mb-1.5">
+                      <div>
+                        <span className="text-xs font-semibold text-apple-gray-900">{ex.label}</span>
+                        <span className="text-[11px] text-apple-gray-400 ml-1.5">{ex.sub}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px]">
+                        <span className="text-apple-green font-semibold">{ex.counts.APPROVE}A</span>
+                        <span className="text-apple-orange font-semibold">{ex.counts.REVIEW}R</span>
+                        <span className="text-apple-red font-semibold">{ex.counts.REJECT}X</span>
+                      </div>
+                    </div>
+                    {/* Stacked bar */}
+                    <div className="flex h-2 rounded-full overflow-hidden bg-apple-gray-100 gap-px">
+                      {ex.counts.APPROVE > 0 && (
+                        <div className="bg-apple-green h-full transition-all"
+                          style={{ width: `${(ex.counts.APPROVE / rowTotal) * 100}%` }} />
+                      )}
+                      {ex.counts.REVIEW > 0 && (
+                        <div className="bg-apple-orange h-full transition-all"
+                          style={{ width: `${(ex.counts.REVIEW / rowTotal) * 100}%` }} />
+                      )}
+                      {ex.counts.REJECT > 0 && (
+                        <div className="bg-apple-red h-full transition-all"
+                          style={{ width: `${(ex.counts.REJECT / rowTotal) * 100}%` }} />
+                      )}
+                    </div>
                   </div>
-                  <div className="score-bar">
-                    <div
-                      className={`score-fill ${row.pct >= 75 ? 'bg-apple-green' : row.pct >= 60 ? 'bg-apple-blue' : 'bg-apple-orange'}`}
-                      style={{ width: `${row.pct}%` }}
-                    />
+                )
+              })}
+            </div>
+          )}
+          <div className="mt-auto pt-3 border-t border-apple-gray-100 flex gap-4 text-[11px]">
+            {[['#34c759','Approve'],['#ff9500','Review'],['#ff3b30','Reject']].map(([c, l]) => (
+              <div key={l} className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full" style={{ background: c }} />
+                <span className="text-apple-gray-500">{l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Panel 3 — Knowledge Bases */}
+        <div className="card p-6 flex flex-col gap-3">
+          <p className="section-label">Knowledge Bases</p>
+          {kbStats === null ? (
+            <div className="flex items-center gap-2 mt-2">
+              <div className="w-3.5 h-3.5 border border-apple-blue border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs text-apple-gray-400">Loading…</span>
+            </div>
+          ) : (
+            <div className="space-y-3 flex-1">
+              {kbStats.experts.map(ex => (
+                <div key={ex.key} className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-apple-gray-900 leading-tight">{ex.label}</p>
+                    <p className="text-[11px] text-apple-gray-400 truncate">{ex.description}</p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <span className={`text-sm font-bold ${ex.doc_count > 0 ? 'text-apple-blue' : 'text-apple-gray-300'}`}>
+                      {ex.doc_count.toLocaleString()}
+                    </span>
+                    <p className="text-[10px] text-apple-gray-400">docs</p>
                   </div>
                 </div>
               ))}
             </div>
           )}
+          {kbStats !== null && (
+            <div className="mt-auto pt-3 border-t border-apple-gray-100 flex items-center justify-between">
+              <span className="text-[11px] text-apple-gray-400">Case precedents indexed</span>
+              <span className="text-sm font-bold text-apple-gray-900">{kbStats.cases_indexed}</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Recent evaluations */}
+      {/* Full evaluations table */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-apple-gray-900">Recent Evaluations</h2>
-          <span className="text-xs text-apple-gray-400">{evaluations.length} shown</span>
+          <h2 className="text-base font-semibold text-apple-gray-900">All Evaluations</h2>
+          <span className="text-xs text-apple-gray-400">{evaluations.length} records</span>
         </div>
         <div className="card overflow-hidden">
           <table className="w-full text-sm">

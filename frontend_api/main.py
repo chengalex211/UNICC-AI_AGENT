@@ -722,6 +722,77 @@ def get_evaluation_audit(incident_id: str) -> dict:
     return {"incident_id": incident_id, "events": events, "spans": spans}
 
 
+@app.get("/knowledge/stats")
+def get_knowledge_stats() -> dict:
+    """Return doc counts for each expert's ChromaDB plus indexed cases count."""
+    experts = [
+        {
+            "key": "expert1",
+            "label": "Expert 1 · Security",
+            "description": "MITRE ATLAS attack techniques & case studies",
+            "path": str(BASE_DIR / "Expert1" / "rag" / "chroma_db_expert1"),
+            "collection": "expert1_attack_techniques",
+            "collection2": "expert1_attack_strategies",
+        },
+        {
+            "key": "expert2",
+            "label": "Expert 2 · Governance",
+            "description": "EU AI Act legal compliance",
+            "path": str(BASE_DIR / "Expert 2" / "chroma_db_expert2"),
+            "collection": "expert2_legal_compliance",
+            "collection2": None,
+        },
+        {
+            "key": "expert3",
+            "label": "Expert 3 · UN Mission",
+            "description": "UN Charter AI safety reference",
+            "path": str(BASE_DIR / "Expert 3" / "expert3_rag" / "chroma_db"),
+            "collection": "expert3_un_context",
+            "collection2": None,
+        },
+    ]
+    results = []
+    try:
+        import chromadb as _chroma
+        for ex in experts:
+            try:
+                client = _chroma.PersistentClient(path=ex["path"])
+                total = 0
+                for col_name in [ex["collection"], ex.get("collection2")]:
+                    if not col_name:
+                        continue
+                    try:
+                        total += client.get_collection(col_name).count()
+                    except Exception:
+                        pass
+                results.append({
+                    "key": ex["key"],
+                    "label": ex["label"],
+                    "description": ex["description"],
+                    "doc_count": total,
+                    "status": "ok",
+                })
+            except Exception as e:
+                results.append({
+                    "key": ex["key"],
+                    "label": ex["label"],
+                    "description": ex["description"],
+                    "doc_count": 0,
+                    "status": f"error: {e}",
+                })
+    except ImportError:
+        results = [
+            {"key": ex["key"], "label": ex["label"], "description": ex["description"],
+             "doc_count": 0, "status": "chromadb not installed"}
+            for ex in experts
+        ]
+    # Cases indexed in knowledge_index.jsonl
+    cases_indexed = 0
+    if INDEX_PATH.exists():
+        cases_indexed = sum(1 for _ in INDEX_PATH.read_text(encoding="utf-8").splitlines() if _.strip())
+    return {"experts": results, "cases_indexed": cases_indexed}
+
+
 @app.get("/knowledge/index")
 def get_knowledge_index(limit: int = Query(default=20, ge=1, le=500)) -> dict:
     if not INDEX_PATH.exists():
