@@ -126,6 +126,8 @@ export interface RepoAnalyzeRequest {
 }
 
 export interface RepoAnalyzeResponse {
+  system_name: string
+  agent_id: string
   system_description: string
   capabilities: string
   data_sources: string

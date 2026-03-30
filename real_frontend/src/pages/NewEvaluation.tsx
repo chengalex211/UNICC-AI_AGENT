@@ -46,13 +46,15 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
     }
 
   // Apply structured analysis result to the form
-  const applyResult = (r: { system_description: string; capabilities: string; data_sources: string; human_oversight: string; category: string; deploy_zone: string }) => {
+  const applyResult = (r: { system_name?: string; agent_id?: string; system_description: string; capabilities: string; data_sources: string; human_oversight: string; category: string; deploy_zone: string }) => {
     setForm(f => ({
       ...f,
-      description:     r.system_description || f.description,
-      capabilities:    r.capabilities       || f.capabilities,
-      data_sources:    r.data_sources        || f.data_sources,
-      human_oversight: r.human_oversight     || f.human_oversight,
+      system_name:     r.system_name         || f.system_name,
+      agent_id:        r.agent_id            || f.agent_id,
+      description:     r.system_description  || f.description,
+      capabilities:    r.capabilities        || f.capabilities,
+      data_sources:    r.data_sources         || f.data_sources,
+      human_oversight: r.human_oversight      || f.human_oversight,
       category:        r.category && CATEGORIES.includes(r.category) ? r.category : f.category,
       deploy_zone:     r.deploy_zone && DEPLOY_ZONES.includes(r.deploy_zone) ? r.deploy_zone : f.deploy_zone,
     }))

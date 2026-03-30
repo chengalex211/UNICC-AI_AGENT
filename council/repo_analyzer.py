@@ -241,6 +241,11 @@ You are an AI safety analyst for UNICC. Analyse the provided content and return
 a JSON object (and ONLY a JSON object — no markdown fences, no commentary) with
 exactly these keys:
 
+  system_name        : string  (short human-readable name of the system, e.g.
+                                 "Petri AI Safety Agent" or "RefugeeAssist v2";
+                                 derive from the repo/document name or title)
+  agent_id           : string  (URL-safe slug: lowercase letters, digits, hyphens
+                                 only, max 40 chars, e.g. "petri-ai-safety-agent")
   system_description : string  (300-600 words, comprehensive factual description
                                  covering purpose, capabilities, architecture,
                                  data flows, PII handling, and any visible risk
@@ -286,6 +291,8 @@ Return the JSON object now.
 """
 
 _EMPTY_RESULT: dict = {
+    "system_name": "",
+    "agent_id": "",
     "system_description": "",
     "capabilities": "",
     "data_sources": "",
@@ -324,7 +331,15 @@ def _parse_structured(raw: str) -> dict:
     if zone not in _DEPLOY_ZONES:
         zone = "Global/Multi-Region"
 
+    # Sanitise agent_id to a safe slug
+    raw_id = str(data.get("agent_id", ""))
+    import re
+    agent_id = re.sub(r"[^a-z0-9-]", "-", raw_id.lower().strip())
+    agent_id = re.sub(r"-+", "-", agent_id).strip("-")[:40]
+
     return {
+        "system_name":        str(data.get("system_name", "")),
+        "agent_id":           agent_id,
         "system_description": str(data.get("system_description", "")),
         "capabilities":       str(data.get("capabilities", "")),
         "data_sources":       str(data.get("data_sources", "")),
