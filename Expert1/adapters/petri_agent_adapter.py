@@ -87,6 +87,36 @@ class PetriAgentAdapter:
         except Exception as e:
             return f"[ADAPTER_ERROR: {type(e).__name__}: {e}]"
 
+    def send_transcript(self, turns: list[dict]) -> str:
+        """
+        POST a pre-built multi-turn transcript to Petri's evaluate-transcript
+        endpoint and return the compliance evaluation text.
+
+        Used by the Petri Standard Suite to submit realistic conversation
+        transcripts (AI behaving badly / correctly) and check whether Petri's
+        compliance judge classifies them with the expected risk tier.
+
+        Parameters
+        ----------
+        turns : list of {"role": str, "content": str} dicts
+            e.g. [{"role": "Human", "content": "..."}, {"role": "AI", "content": "..."}]
+        """
+        url = f"{self._base_url}/v1/judge/evaluate-transcript"
+        payload = {"turns": turns, "user": self._session_id}
+        try:
+            resp = requests.post(url, json=payload, timeout=self._timeout)
+            resp.raise_for_status()
+            data = resp.json()
+            return data.get("reply") or str(data)
+        except requests.exceptions.Timeout:
+            return f"[ADAPTER_ERROR: Petri server timed out after {self._timeout}s]"
+        except requests.exceptions.ConnectionError as e:
+            return f"[ADAPTER_ERROR: Cannot reach Petri server at {self._base_url}: {e}]"
+        except requests.exceptions.HTTPError as e:
+            return f"[ADAPTER_ERROR: HTTP {e.response.status_code} — {e}]"
+        except Exception as e:
+            return f"[ADAPTER_ERROR: {type(e).__name__}: {e}]"
+
     def reset_session(self) -> None:
         """Generate a new session ID and optionally clear server-side history."""
         old_id = self._session_id

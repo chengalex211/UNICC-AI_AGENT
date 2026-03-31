@@ -19,9 +19,11 @@ LLM 接口通过 LLMBackend 抽象类切换：
   - VLLMBackend：DGX 生产部署（本地 vLLM 服务器）
 """
 
+import concurrent.futures
 import json
 import os
 import re
+import threading
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -157,6 +159,11 @@ class EvaluationSession:
 
     breaches: list[BreachRecord] = field(default_factory=list)
     techniques_tested: list[dict] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        # Not a dataclass field — kept out of asdict() serialization.
+        # Protects concurrent writes to attack_log / breaches in parallel Phase 3.
+        self._lock: threading.Lock = threading.Lock()
 
 
 # ─── LLM BACKEND ABSTRACTION ─────────────────────────────────────────────────
@@ -451,15 +458,26 @@ class Expert1Router:
             print(f"    ERROR generating probe plan: {e}")
             return
 
-        for msg_def in plan.get("probe_messages", []):
+        msg_defs = plan.get("probe_messages", [])
+        if not msg_defs:
+            return
+
+        # Run all adapter calls concurrently — each probe is independent.
+        def _execute_probe(msg_def: dict) -> tuple[dict, str, str]:
             message = msg_def.get("message", "")
             try:
                 response = adapter.send_message(message)
             except (AdapterTimeoutError, AdapterUnavailableError) as e:
                 response = f"[ERROR: {e}]"
-            adapter.reset_session()
-
             classification = self._classify_probe(response)
+            return msg_def, response, classification
+
+        max_workers = min(len(msg_defs), 4)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
+            results = list(ex.map(_execute_probe, msg_defs))
+
+        for msg_def, response, classification in results:
+            message = msg_def.get("message", "")
             entry = ProbeEntry(
                 id=msg_def.get("id", "P-?"),
                 category=msg_def.get("category", ""),
@@ -490,17 +508,28 @@ class Expert1Router:
             print(f"    ERROR generating boundary plan: {e}")
             return
 
-        for msg_def in plan.get("boundary_messages", []):
+        msg_defs = plan.get("boundary_messages", [])
+        if not msg_defs:
+            return
+
+        # Run all adapter calls concurrently — each boundary test is independent.
+        def _execute_boundary(msg_def: dict) -> tuple[dict, str, str]:
             message = msg_def.get("message", "")
             try:
                 response = adapter.send_message(message)
             except Exception as e:
                 response = f"[ERROR: {e}]"
-            adapter.reset_session()
-
             classification = self._classify_boundary(
                 response, msg_def.get("failure_indicator", "")
             )
+            return msg_def, response, classification
+
+        max_workers = min(len(msg_defs), 4)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
+            results = list(ex.map(_execute_boundary, msg_defs))
+
+        for msg_def, response, classification in results:
+            message = msg_def.get("message", "")
             entry = BoundaryEntry(
                 id=msg_def.get("id", "B-?"),
                 boundary_type=msg_def.get("boundary_type", ""),
@@ -571,6 +600,8 @@ class Expert1Router:
         else:
             augmented_context = profile.deployment_context
 
+        # Build full task list before parallelising so techniques_tested preserves order.
+        tasks: list[tuple[TechniqueInfo, str]] = []
         for tech_raw in selected:
             tech = self._build_technique_info(tech_raw)
             attack_goal = (
@@ -587,10 +618,23 @@ class Expert1Router:
                 "id": tech.id, "name": tech.name,
                 "source": tech.source, "layer": tech.attack_layer,
             })
-
             print(f"    Technique: {tech.id} — {tech.name} [{tech.attack_layer}]")
-            self._run_single_technique(tech, attack_goal, profile, adapter, session)
-            adapter.reset_session()
+            tasks.append((tech, attack_goal))
+
+        # Run all techniques in parallel — each technique gets its own multi-turn loop.
+        # EvaluationSession._lock protects concurrent writes to attack_log / breaches.
+        def _run_technique_safe(args: tuple) -> None:
+            tech, attack_goal = args
+            try:
+                self._run_single_technique(tech, attack_goal, profile, adapter, session)
+            except Exception as e:
+                print(f"    ERROR in parallel technique {tech.id}: {e}")
+
+        max_workers = min(len(tasks), 3)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
+            futures = [ex.submit(_run_technique_safe, t) for t in tasks]
+            for f in concurrent.futures.as_completed(futures):
+                f.result()  # re-raise any unhandled exception
 
     def _run_single_technique(
         self, tech: TechniqueInfo, attack_goal: str,
@@ -646,7 +690,8 @@ class Expert1Router:
                 evidence=evidence,
                 score=score,
             )
-            session.attack_log.append(turn_entry)
+            with session._lock:
+                session.attack_log.append(turn_entry)
             history.append({
                 "message":        message,
                 "response":       response,
@@ -658,14 +703,15 @@ class Expert1Router:
 
             # 停止条件 1: BREACH
             if classification == "BREACH":
-                session.breaches.append(BreachRecord(
-                    technique_id=tech.id,
-                    technique_name=tech.name,
-                    source=tech.source,
-                    turn=len(history),
-                    evidence=evidence,
-                    score=score,
-                ))
+                with session._lock:
+                    session.breaches.append(BreachRecord(
+                        technique_id=tech.id,
+                        technique_name=tech.name,
+                        source=tech.source,
+                        turn=len(history),
+                        evidence=evidence,
+                        score=score,
+                    ))
                 print(f"      ⚠ BREACH detected at turn {len(history)}")
                 break
 
