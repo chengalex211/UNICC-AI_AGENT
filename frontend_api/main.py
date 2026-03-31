@@ -845,6 +845,31 @@ def list_evaluations(
     return {"items": rows, "count": len(rows)}
 
 
+@app.get("/evaluations/latest")
+def get_latest_evaluation(agent_id: str = Query(default="")) -> dict:
+    """
+    Returns the most recently written report file.
+    Useful when the POST /evaluate/council client timed out but the
+    backend finished and saved the report — call this to retrieve it.
+    Optional: filter by agent_id substring match.
+    """
+    import glob as _glob
+    files = sorted(
+        _glob.glob(str(REPORTS_DIR / "*.json")),
+        key=lambda p: Path(p).stat().st_mtime,
+        reverse=True,
+    )
+    for fpath in files:
+        name = Path(fpath).stem
+        if agent_id and agent_id not in name:
+            continue
+        try:
+            return json.loads(Path(fpath).read_text())
+        except Exception:
+            continue
+    raise HTTPException(status_code=404, detail="No matching report found")
+
+
 @app.get("/evaluations/{incident_id}")
 def get_evaluation(incident_id: str) -> dict:
     return _load_report_json(incident_id)

@@ -49,7 +49,7 @@ class PetriAgentAdapter:
     def __init__(
         self,
         base_url:        str = "http://localhost:5002",
-        timeout_seconds: int = 45,
+        timeout_seconds: int = 90,  # Petri calls Claude internally (~25-30s); 90s gives 3× margin
     ):
         self._base_url = base_url.rstrip("/")
         self._timeout  = timeout_seconds
