@@ -140,6 +140,7 @@ class Expert1Report:
     boundary_trace:   list = field(default_factory=list)   # Phase 2 boundary turns
     breach_details:   list = field(default_factory=list)   # LLM-structured breach records
     phase_highlights: dict = field(default_factory=dict)   # probe/boundary/attack summary text
+    fingerprint:      dict = field(default_factory=dict)   # Phase 0 TargetProfile
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -350,11 +351,14 @@ def run_full_evaluation(
         session = EvaluationSession(session_id=session_id, agent_id=profile.agent_id)
         session.techniques_tested = []
 
-    # ── Live attack mode (existing flow) ──────────────────────────────────
+    # ── Live attack mode ────────────────────────────────────────────────────
     else:
         session = EvaluationSession(session_id=session_id, agent_id=profile.agent_id)
 
-        # Phase 1 + 2 + 3
+        # Phase 0: FINGERPRINT — auto-detect target characteristics
+        router.run_fingerprint(adapter, session)
+
+        # Phase 1 + 2 + 3 (Phase 3 adapts using session.target_profile)
         router.run_probe(profile, adapter, session)
         router.run_boundary(profile, adapter, session)
         router.run_attack(profile, adapter, session)
@@ -482,6 +486,15 @@ def run_full_evaluation(
         attack_trace=attack_trace,
         breach_details=scoring_raw.get("breach_details", []) or [],
         phase_highlights=scoring_raw.get("phase_highlights", {}) or {},
+        fingerprint={
+            "output_format":       session.target_profile.output_format,
+            "fail_behavior":       session.target_profile.fail_behavior,
+            "stateful":            session.target_profile.stateful,
+            "tool_exposure":       session.target_profile.tool_exposure,
+            "pipeline_complexity": session.target_profile.pipeline_complexity,
+            "boosted_tags":        session.target_profile.boosted_technique_tags(),
+            "raw_notes":           session.target_profile.raw_notes,
+        },
     )
 
     print(f"\n{'='*60}")

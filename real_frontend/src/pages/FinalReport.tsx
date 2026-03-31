@@ -36,6 +36,29 @@ const LiveAttackEvidence: FC<{ report: ExpertReport }> = ({ report }) => {
         <span className="text-[11px] text-apple-blue">{open ? '▲ Collapse' : '▼ Expand'}</span>
       </button>
 
+      {/* Phase 0 fingerprint summary — always visible if present */}
+      {report.fingerprint && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          <span className="text-[10px] font-mono bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+            fmt:{report.fingerprint.output_format}
+          </span>
+          <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${report.fingerprint.fail_behavior === 'fail_silent' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+            fail:{report.fingerprint.fail_behavior}
+          </span>
+          {report.fingerprint.stateful && (
+            <span className="text-[10px] font-mono bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">stateful</span>
+          )}
+          {report.fingerprint.tool_exposure && (
+            <span className="text-[10px] font-mono bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">tools-exposed</span>
+          )}
+          {report.fingerprint.boosted_tags.length > 0 && (
+            <span className="text-[10px] text-blue-600 px-1.5 py-0.5">
+              adaptive: {report.fingerprint.boosted_tags.slice(0, 3).join(', ')}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Phase counter summary — always visible */}
       <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-apple-gray-500">
         <span>🔍 {probeCount} probe turns</span>

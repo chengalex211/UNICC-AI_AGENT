@@ -42,6 +42,77 @@ const ClassChip: FC<{ cls: string }> = ({ cls }) => {
 }
 
 // ── Live Attack Trail panel ───────────────────────────────────────────────────
+const FingerprintPanel: FC<{ report: ExpertReport }> = ({ report }) => {
+  const fp = report.fingerprint
+  if (!fp) return null
+
+  const formatTag = (format: string) => {
+    const map: Record<string, { label: string; color: string }> = {
+      xml_pipeline:           { label: 'XML Pipeline',         color: 'bg-red-100 text-red-700' },
+      conversational_wrapper: { label: 'Conversational Wrapper', color: 'bg-amber-100 text-amber-700' },
+      structured_compliant:   { label: 'Structured Compliant', color: 'bg-green-100 text-green-700' },
+      free_text:              { label: 'Free Text',            color: 'bg-gray-100 text-gray-600' },
+    }
+    return map[format] ?? { label: format, color: 'bg-gray-100 text-gray-600' }
+  }
+
+  const failTag = (fail: string) => {
+    const map: Record<string, { label: string; color: string }> = {
+      fail_silent:  { label: 'Fail Silent ⚠️',  color: 'bg-red-100 text-red-700' },
+      fail_visible: { label: 'Fail Visible ✓',  color: 'bg-green-100 text-green-700' },
+      graceful:     { label: 'Graceful ✓',       color: 'bg-green-100 text-green-700' },
+      unknown:      { label: 'Unknown',           color: 'bg-gray-100 text-gray-500' },
+    }
+    return map[fail] ?? { label: fail, color: 'bg-gray-100 text-gray-600' }
+  }
+
+  const ft = formatTag(fp.output_format)
+  const flt = failTag(fp.fail_behavior)
+
+  return (
+    <div className="mt-4 mb-2 rounded-apple border border-blue-200 bg-blue-50 p-4">
+      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-3">
+        Phase 0 — Target Fingerprint
+      </p>
+      <div className="flex flex-wrap gap-2 mb-3">
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${ft.color}`}>
+          Format: {ft.label}
+        </span>
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${flt.color}`}>
+          Fail: {flt.label}
+        </span>
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${fp.stateful ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
+          {fp.stateful ? 'Stateful ⚠️' : 'Stateless ✓'}
+        </span>
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${fp.tool_exposure ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
+          {fp.tool_exposure ? 'Tools Exposed ⚠️' : 'No Tool Exposure ✓'}
+        </span>
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${fp.pipeline_complexity === 'heavy' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
+          Pipeline: {fp.pipeline_complexity}
+        </span>
+      </div>
+      {fp.boosted_tags.length > 0 && (
+        <div className="mb-2">
+          <span className="text-xs text-blue-600 font-medium">Adaptive techniques injected: </span>
+          <span className="text-xs text-blue-800">{fp.boosted_tags.join(', ')}</span>
+        </div>
+      )}
+      {fp.raw_notes.length > 0 && (
+        <details className="mt-1">
+          <summary className="text-xs text-blue-600 cursor-pointer hover:text-blue-800">
+            View probe notes ({fp.raw_notes.length})
+          </summary>
+          <ul className="mt-1.5 space-y-0.5">
+            {fp.raw_notes.map((note, i) => (
+              <li key={i} className="text-xs text-blue-700 font-mono bg-blue-100 rounded px-2 py-0.5">{note}</li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
+  )
+}
+
 const AttackTrailPanel: FC<{ report: ExpertReport }> = ({ report }) => {
   const [tab, setTab] = useState<'breach' | 'probe' | 'boundary' | 'attack' | 'suite'>('breach')
 
@@ -569,6 +640,7 @@ const ExpertAnalysis: FC<Props> = ({ evaluation }) => {
         </div>
 
         {/* Attack Trail — only for Expert 1 in live mode */}
+        {active.id === 'security' && <FingerprintPanel report={active} />}
         {active.id === 'security' && <AttackTrailPanel report={active} />}
       </div>
     </div>

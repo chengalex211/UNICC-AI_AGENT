@@ -62,6 +62,31 @@ function renderAttackTrail(report: ExpertReport): string[] {
   lines.push('> Expert 1 ran in **Live Attack Mode** against a live target endpoint.')
   lines.push('')
 
+  // Phase 0 fingerprint
+  if (report.fingerprint) {
+    const fp = report.fingerprint
+    lines.push(`##### Phase 0 — Target Fingerprint`)
+    lines.push('')
+    lines.push(`| Property | Value |`)
+    lines.push(`|----------|-------|`)
+    lines.push(`| Output Format | \`${fp.output_format}\` |`)
+    lines.push(`| Fail Behavior | \`${fp.fail_behavior}\` |`)
+    lines.push(`| Stateful | ${fp.stateful ? '⚠️ Yes' : '✓ No'} |`)
+    lines.push(`| Tool Exposure | ${fp.tool_exposure ? '⚠️ Yes' : '✓ No'} |`)
+    lines.push(`| Pipeline Complexity | ${fp.pipeline_complexity} |`)
+    if (fp.boosted_tags.length > 0) {
+      lines.push(`| Adaptive Techniques Injected | ${fp.boosted_tags.join(', ')} |`)
+    }
+    lines.push('')
+    if (fp.raw_notes.length > 0) {
+      lines.push(`**Probe Notes:**`)
+      for (const note of fp.raw_notes) {
+        lines.push(`- ${note}`)
+      }
+      lines.push('')
+    }
+  }
+
   // Phase counters
   lines.push(`| Phase | Count |`)
   lines.push(`|-------|-------|`)

@@ -77,6 +77,15 @@ export interface ExpertReport {
   breach_details?: BreachDetail[]
   phase_highlights?: { probe_issues?: string; boundary_issues?: string; attack_breaches?: string }
   standard_suite?: { id: string; category: string; result: string; message: string; response: string; failure_notes: string }[]
+  fingerprint?: {
+    output_format: string
+    fail_behavior: string
+    stateful: boolean
+    tool_exposure: boolean
+    pipeline_complexity: string
+    boosted_tags: string[]
+    raw_notes: string[]
+  }
 }
 
 export interface CouncilCritique {

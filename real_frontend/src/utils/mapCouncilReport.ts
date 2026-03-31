@@ -108,6 +108,7 @@ export function councilReportToDetailedEvaluation(report: CouncilReportResponse)
       standard_suite:  Array.isArray(security.standard_suite_results?.all_results)
                          ? security.standard_suite_results.all_results
                          : undefined,
+      fingerprint: security.fingerprint ?? undefined,
     },
     {
       id: 'governance',
