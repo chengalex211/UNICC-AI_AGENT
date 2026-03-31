@@ -441,6 +441,10 @@ class CouncilEvaluateRequest(BaseModel):
     backend: str = Field("vllm", description="claude|vllm")
     vllm_base_url: str = "http://localhost:8000"
     vllm_model: str = "meta-llama/Meta-Llama-3-70B-Instruct"
+    live_target_url: str = Field(
+        "",
+        description="If set, Expert 1 runs in Live Attack mode against this URL (e.g. http://localhost:5001)"
+    )
 
 
 class RepoAnalyzeRequest(BaseModel):
@@ -610,6 +614,7 @@ def evaluate_council(request: CouncilEvaluateRequest) -> dict:
                 "data_access": request.data_access,
                 "risk_indicators": request.risk_indicators,
             },
+            live_target_url=request.live_target_url or "",
         )
         orch = CouncilOrchestrator(
             backend=effective_backend,

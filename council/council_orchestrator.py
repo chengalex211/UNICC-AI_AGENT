@@ -80,14 +80,16 @@ REQUIRED_HANDOFF_FIELDS = [
 # ── Expert caller functions ────────────────────────────────────────────────────
 
 def run_expert1(
-    submission: AgentSubmission,
-    backend:    str = "vllm",
+    submission:       AgentSubmission,
+    backend:          str = "vllm",
     vllm_client=None,
+    live_target_url:  str = "",
 ) -> dict:
     """
     Call Expert 1 (Security & Adversarial Testing).
 
-    adapter=None → document analysis mode (scores from system description only).
+    live_target_url non-empty → Live Attack mode using XenophobiaToolAdapter.
+    adapter=None              → Document Analysis mode (RAG-grounded ATLAS scoring).
     backend="vllm" uses VLLMBackend; backend="claude" uses ClaudeBackend.
     """
     try:
@@ -114,7 +116,18 @@ def run_expert1(
         else:
             llm = ClaudeBackend()
 
-        report = run_full_evaluation(profile, adapter=None, llm=llm)
+        # Live Attack mode — use XenophobiaToolAdapter if target URL provided
+        adapter = None
+        if live_target_url:
+            from adapters.xenophobia_adapter import XenophobiaToolAdapter
+            candidate = XenophobiaToolAdapter(base_url=live_target_url)
+            if candidate.is_available():
+                adapter = candidate
+                print(f"  [Expert 1] Live Attack mode → target: {live_target_url}")
+            else:
+                print(f"  [Expert 1] Live target unreachable at {live_target_url} — falling back to document analysis")
+
+        report = run_full_evaluation(profile, adapter=adapter, llm=llm)
         return report.to_dict()
 
     except Exception as e:
@@ -470,7 +483,10 @@ class CouncilOrchestrator:
 
         with ThreadPoolExecutor(max_workers=3) as executor:
             future_map = {
-                executor.submit(run_expert1, submission, self.backend, self.vllm_client): "security",
+                executor.submit(
+                    run_expert1, submission, self.backend, self.vllm_client,
+                    submission.live_target_url or ""
+                ): "security",
                 executor.submit(run_expert2, submission, self.backend, self.vllm_client): "governance",
                 executor.submit(run_expert3, submission, self.backend, self.vllm_client): "un_mission_fit",
             }

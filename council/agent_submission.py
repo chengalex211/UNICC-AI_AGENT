@@ -26,6 +26,7 @@ class AgentSubmission:
     system_description: str
     system_name:        str = ""
     metadata:           dict = field(default_factory=dict)
+    live_target_url:    str = ""   # non-empty → Expert 1 live attack mode
 
     def to_expert1_profile(self) -> dict:
         """

@@ -43,6 +43,8 @@ export interface CouncilEvaluateRequest {
   backend?: 'claude' | 'vllm'
   vllm_base_url?: string
   vllm_model?: string
+  /** If set, Expert 1 runs in Live Attack mode against this URL (e.g. http://localhost:5001) */
+  live_target_url?: string
 }
 
 export interface CouncilReportResponse {

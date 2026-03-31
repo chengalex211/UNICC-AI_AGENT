@@ -35,6 +35,7 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
   const [form, setForm] = useState({
     system_name: '', agent_id: '', category: '', deploy_zone: '',
     description: '', capabilities: '', data_sources: '', human_oversight: '',
+    live_target_url: '',
   })
 
   const [inputMode, setInputMode]       = useState<InputMode>('paste')
@@ -135,6 +136,7 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
         backend: defaultBackend(),
         vllm_base_url: import.meta.env.VITE_VLLM_BASE_URL || 'http://127.0.0.1:8000',
         vllm_model: import.meta.env.VITE_VLLM_MODEL || 'meta-llama/Meta-Llama-3-70B-Instruct',
+        live_target_url: form.live_target_url.trim() || undefined,
       }
       const report = await submitCouncilEvaluation(payload)
       stopPolling()
@@ -358,6 +360,29 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
                 </div>
               </div>
             </details>
+
+            {/* Live Attack Target (optional) */}
+            <details className="group">
+              <summary className="text-[11px] text-apple-gray-500 cursor-pointer select-none list-none flex items-center gap-1 hover:text-apple-gray-700">
+                <span className="group-open:rotate-90 inline-block transition-transform">▶</span>
+                Live Attack Testing — Expert 1 (optional)
+              </summary>
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2 p-2.5 rounded-apple bg-orange-50 border border-orange-100">
+                  <span className="text-orange-500 text-sm">⚡</span>
+                  <p className="text-xs text-orange-700 leading-relaxed">
+                    If set, Expert 1 will send live adversarial probes to this endpoint instead of static document analysis.
+                    The target must implement the Dify workflow API at <code className="font-mono">/v1/workflows/run</code>.
+                  </p>
+                </div>
+                <input
+                  className="input-field font-mono text-xs"
+                  placeholder="http://localhost:5001  (leave blank for document analysis)"
+                  value={form.live_target_url}
+                  onChange={set('live_target_url')}
+                />
+              </div>
+            </details>
           </div>
         )}
 
@@ -371,10 +396,11 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
                 ['Agent ID',       form.agent_id],
                 ['Category',       form.category || '—'],
                 ['Deployment Zone',form.deploy_zone || '—'],
+                ...(form.live_target_url.trim() ? [['Live Attack Target', form.live_target_url.trim()]] : []),
               ].map(([k, v]) => (
                 <div key={k} className="flex justify-between py-2.5 border-b border-apple-gray-100">
                   <span className="text-xs text-apple-gray-400">{k}</span>
-                  <span className="text-sm font-semibold text-apple-gray-900">{v}</span>
+                  <span className={`text-sm font-semibold ${k === 'Live Attack Target' ? 'text-orange-600 font-mono text-xs' : 'text-apple-gray-900'}`}>{v}</span>
                 </div>
               ))}
             </div>
