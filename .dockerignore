@@ -1,0 +1,46 @@
+# ── Node ──────────────────────────────────────────────────────────────────────
+node_modules/
+real_frontend/node_modules/
+mock_frontend/node_modules/
+# dist is built inside Docker; don't copy a local stale copy
+real_frontend/dist/
+
+# ── Python ─────────────────────────────────────────────────────────────────────
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+.Python
+.venv/
+venv/
+ENV/
+*.egg-info/
+
+# ── Git ────────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+
+# ── Secrets / env ─────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+expert3_rag/env
+
+# ── Runtime data (rebuilt/generated at container start) ───────────────────────
+council/council.db
+council/reports/
+
+# ── Dev / editor ──────────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*.log
+.cache/
+
+# ── Docs (not needed in container) ────────────────────────────────────────────
+docs/
+UNICC-Project-2/
+AIIIII/
+benchmark_data/
+exports/
