@@ -246,10 +246,25 @@ exactly these keys:
                                  derive from the repo/document name or title)
   agent_id           : string  (URL-safe slug: lowercase letters, digits, hyphens
                                  only, max 40 chars, e.g. "petri-ai-safety-agent")
-  system_description : string  (300-600 words, comprehensive factual description
-                                 covering purpose, capabilities, architecture,
-                                 data flows, PII handling, and any visible risk
-                                 indicators or safety-relevant design choices)
+  system_description : string  (400-700 words, comprehensive factual description.
+                                 You MUST cover ALL of the following in the description:
+                                 (1) PURPOSE: what problem the system solves and for whom
+                                 (2) WEB FRAMEWORK: the specific framework used (e.g. Flask,
+                                     Django, FastAPI, Express, Rails) — state "no web framework
+                                     identified" if none visible
+                                 (3) LLM/AI BACKEND: the specific AI model or API used (e.g.
+                                     GPT-4o, Claude, Whisper, Llama) — state "no LLM backend
+                                     identified" if none visible
+                                 (4) INPUT METHODS AND FILE HANDLING: how users submit data —
+                                     file upload types accepted, size limits, input surfaces;
+                                     state "no file upload capability identified" if none visible
+                                 (5) AUTHENTICATION AND ACCESS CONTROL: whether the system has
+                                     login/auth, API key controls, role-based access — state
+                                     "no authentication layer identified" if none visible
+                                 (6) DATA FLOWS AND PII: what data moves through the system
+                                     and whether personal/sensitive data is processed
+                                 (7) RISK INDICATORS: any visible safety-relevant design choices,
+                                     missing safeguards, or deployment concerns)
   capabilities       : string  (one sentence or short comma-separated list of
                                  the system's key technical capabilities)
   data_sources       : string  (brief description of data inputs / APIs / databases
@@ -266,6 +281,8 @@ exactly these keys:
                                  Field Office | Global/Multi-Region)
 
 Base every field strictly on the provided content. Do not speculate.
+The system_description MUST explicitly mention the web framework, LLM backend,
+file upload surface, and authentication status — even if any of them are absent.
 Return valid JSON only.
 """
 

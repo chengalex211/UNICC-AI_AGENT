@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 import threading as _threading
-from fastapi import FastAPI, BackgroundTasks, HTTPException, Query
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel, Field
@@ -615,14 +615,28 @@ if _FRONTEND_DIST.is_dir():
 
     app.mount("/assets", StaticFiles(directory=str(_FRONTEND_DIST / "assets")), name="assets")
 
-    @app.get("/", include_in_schema=False)
-    @app.get("/{full_path:path}", include_in_schema=False)
-    def _spa_fallback(full_path: str = ""):
-        # Let any path that doesn't start with /api or /evaluate fall through to index.html
+    # Serve index.html for SPA client-side routes via a 404 exception handler.
+    # This fires ONLY when FastAPI has no matching route, so all API routes
+    # take natural priority — no registration-order issues.
+    from fastapi.responses import JSONResponse as _JSONResponse
+
+    _API_PREFIXES = (
+        "/health", "/evaluate", "/evaluations", "/analyze",
+        "/audit", "/knowledge", "/expert1", "/docs", "/openapi",
+    )
+
+    @app.exception_handler(404)
+    async def _spa_404_handler(request: Request, exc: Exception):
+        path = request.url.path
+        # API paths return proper JSON 404
+        if any(path.startswith(prefix) for prefix in _API_PREFIXES):
+            detail = getattr(exc, "detail", f"Not found: {path}")
+            return _JSONResponse({"detail": detail}, status_code=404)
+        # SPA routes serve index.html
         index = _FRONTEND_DIST / "index.html"
         if index.exists():
             return _FileResponse(str(index))
-        return {"detail": "Frontend not built — run `npm run build` in real_frontend/"}
+        return _JSONResponse({"detail": "Frontend not built — run `npm run build` in real_frontend/"}, status_code=404)
 
 
 class Expert1AttackRequest(BaseModel):
@@ -641,7 +655,22 @@ class Expert1AttackRequest(BaseModel):
 class CouncilEvaluateRequest(BaseModel):
     agent_id: str
     system_name: str = ""
-    system_description: str
+    system_description: str = Field(
+        "",
+        description=(
+            "Full description of the AI system under review. "
+            "If omitted and github_url is provided, the system will automatically "
+            "call /analyze/repo to extract a description from the repository."
+        ),
+    )
+    github_url: str = Field(
+        "",
+        description=(
+            "Optional GitHub repository URL (e.g. https://github.com/owner/repo). "
+            "When provided and system_description is empty, the backend auto-calls "
+            "/analyze/repo to extract the system description before running the council."
+        ),
+    )
     purpose: str = ""
     deployment_context: str = ""
     data_access: list[str] = Field(default_factory=list)
@@ -1049,11 +1078,36 @@ def _run_council_evaluation(
         from council.agent_submission import AgentSubmission
         from council.council_orchestrator import CouncilOrchestrator
 
+        # Auto-extract system description from GitHub URL if not provided
+        resolved_description = request.system_description or ""
+        resolved_system_name = request.system_name or request.agent_id
+        if not resolved_description.strip() and request.github_url.strip():
+            try:
+                print(f"[Council API] system_description empty — auto-analyzing {request.github_url}")
+                from council.repo_analyzer import analyze_repo
+                repo_info = analyze_repo(
+                    source=request.github_url.strip(),
+                    backend=effective_backend,
+                    vllm_base_url=request.vllm_base_url,
+                    vllm_model=request.vllm_model,
+                )
+                resolved_description = repo_info.get("system_description", "")
+                if not resolved_system_name or resolved_system_name == request.agent_id:
+                    resolved_system_name = repo_info.get("system_name", resolved_system_name) or resolved_system_name
+            except Exception as _repo_err:
+                print(f"[Council API] WARNING: repo analysis failed: {_repo_err}")
+
+        if not resolved_description.strip():
+            raise ValueError(
+                "system_description is required. Provide it directly or supply a github_url "
+                "so the backend can extract it automatically."
+            )
+
         submission = AgentSubmission(
             incident_id=incident_id,
             agent_id=request.agent_id,
-            system_description=request.system_description,
-            system_name=request.system_name,
+            system_description=resolved_description,
+            system_name=resolved_system_name,
             metadata={
                 "purpose": request.purpose,
                 "deployment_context": request.deployment_context,

@@ -269,7 +269,7 @@ TOOLS = [
                     },
                     "required": [
                         "privacy_score", "transparency_score", "bias_score",
-                        "human_oversight_required", "compliance_blocks_deployment"
+                        "human_oversight_required", "compliance_blocks_deployment", "note"
                     ]
                 },
 

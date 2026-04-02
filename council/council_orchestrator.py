@@ -238,6 +238,44 @@ def _error_report(expert_key: str, agent_id: str, error: Exception) -> dict:
 
 # ── Validation ─────────────────────────────────────────────────────────────────
 
+def _ensure_handoff_defaults(report: dict, expert_name: str) -> None:
+    """
+    Defensively fill any missing council_handoff fields with safe defaults
+    so that validate_handoff() never blocks arbitration due to LLM omissions.
+    Called before validate_handoff().
+    """
+    if "council_handoff" not in report or not report["council_handoff"]:
+        report["council_handoff"] = {}
+
+    handoff = report["council_handoff"]
+    defaults = {
+        "privacy_score":               3,
+        "transparency_score":          3,
+        "bias_score":                  3,
+        "human_oversight_required":    False,
+        "compliance_blocks_deployment": False,
+        "note": f"{expert_name}: no cross-expert note provided.",
+    }
+    for field, default in defaults.items():
+        if field not in handoff:
+            handoff[field] = default
+
+    # Coerce score fields to int in range 1-5
+    for score_field in ("privacy_score", "transparency_score", "bias_score"):
+        val = handoff.get(score_field)
+        try:
+            val = int(float(val))
+        except (TypeError, ValueError):
+            val = 3
+        handoff[score_field] = max(1, min(5, val))
+
+    # Coerce booleans
+    for bool_field in ("human_oversight_required", "compliance_blocks_deployment"):
+        val = handoff.get(bool_field)
+        if not isinstance(val, bool):
+            handoff[bool_field] = bool(val)
+
+
 def validate_handoff(report: dict, expert_name: str) -> list:
     """
     Validate council_handoff field completeness.
@@ -538,6 +576,7 @@ class CouncilOrchestrator:
                     agent_id=submission.agent_id,
                 )
 
+                _ensure_handoff_defaults(report, key)
                 issues = validate_handoff(report, key)
                 if issues:
                     validation_issues.extend(issues)

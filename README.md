@@ -269,6 +269,41 @@ curl http://localhost:8100/evaluations/inc_20260401_petri-ai-safety_a1b2c3/statu
 curl http://localhost:8100/evaluations/inc_20260401_petri-ai-safety_a1b2c3
 ```
 
+### Document Analysis — VeriMedia example (no live server needed)
+
+Submit any GitHub repository URL for evaluation. Expert 1 runs in document analysis mode (no HTTP connections to the target); the council evaluates based on the extracted system description.
+
+```bash
+# Step 1: Extract system description from GitHub (optional — you can skip and write your own)
+curl -X POST http://localhost:8100/analyze/repo \
+  -H "Content-Type: application/json" \
+  -d '{"source": "https://github.com/FlashCarrot/VeriMedia", "backend": "claude"}'
+# → {"system_name": "VeriMedia", "agent_id": "verimedia", "system_description": "..."}
+
+# Step 2: Submit for full council evaluation (document analysis mode, no live_target_url)
+curl -X POST http://localhost:8100/evaluate/council \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_id": "verimedia",
+    "system_name": "VeriMedia",
+    "github_url": "https://github.com/FlashCarrot/VeriMedia",
+    "backend": "claude"
+  }'
+# → {"incident_id": "inc_..._verimedia_xxxxxx", "status": "running", "poll_url": "/evaluations/.../status"}
+
+# Step 3: Poll until complete (~90 seconds)
+curl http://localhost:8100/evaluations/<incident_id>/status
+# → {"status": "complete", "elapsed_seconds": 92, ...}
+
+# Step 4: Fetch full report
+curl http://localhost:8100/evaluations/<incident_id>
+# → Full CouncilReport JSON with APPROVE/REVIEW/REJECT verdict
+```
+
+> **Note**: When `github_url` is provided without `live_target_url`, the backend automatically calls `/analyze/repo` to extract a rich system description, then runs the full three-expert council. No live server required.
+
+---
+
 ### Python API
 
 ```python

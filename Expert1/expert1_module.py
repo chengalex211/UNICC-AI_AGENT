@@ -593,12 +593,16 @@ def run_full_evaluation(
         for e in session.attack_log
     ]
 
-    # Count tests from the correct suite that was actually run
-    _suite_len = (
-        len(PETRI_STANDARD_SUITE) if (run_standard and _is_transcript_judge(adapter))
-        else len(STANDARD_SUITE)  if run_standard
-        else 0
-    )
+    # Count tests from the correct suite that was actually run.
+    # In document analysis mode (adapter is None) no live tests run → 0.
+    if adapter is None:
+        _suite_len = 0
+    elif run_standard and _is_transcript_judge(adapter):
+        _suite_len = len(PETRI_STANDARD_SUITE)
+    elif run_standard:
+        _suite_len = len(STANDARD_SUITE)
+    else:
+        _suite_len = 0
 
     report = Expert1Report(
         expert="security_adversarial",
@@ -606,7 +610,7 @@ def run_full_evaluation(
         session_id=session_id,
         test_coverage=TestCoverage(
             attack_techniques_tested=session.techniques_tested,
-            standard_suite_completed=run_standard,
+            standard_suite_completed=(run_standard and adapter is not None),
             total_attack_turns=len(session.attack_log),
             total_standard_suite_tests=_suite_len,
         ),
