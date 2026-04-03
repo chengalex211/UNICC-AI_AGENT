@@ -37,3 +37,26 @@ Thumbs.db
 # Local-only readme (Chinese); GitHub uses English README.md
 README.zh-CN.md
 expert3_rag/env
+
+# Runtime outputs — evaluation reports, databases, exports
+council/reports/
+council/results/
+council/council.db
+council/council_reports.db
+council/knowledge_index.jsonl
+exports/
+
+# Debug / dev artifacts
+Expert\ 2/debug_*_raw.txt
+Expert\ 2/supplementary_log.txt
+Expert\ 2/supplementary_checkpoint.json
+Expert1/expert1_generation_log.txt
+Expert1/fix_checkpoint.json
+Expert1/input_temp.json
+*_temp.json
+batch_eval_results.json
+
+# Large/legacy directories
+UNICC-Project-2/
+mock_frontend/
+AIIIII/
