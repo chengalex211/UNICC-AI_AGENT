@@ -60,3 +60,29 @@ batch_eval_results.json
 UNICC-Project-2/
 mock_frontend/
 AIIIII/
+
+# Training data generation scripts (not needed to run the system)
+generate_expert*.py
+generate_mode_b_training.py
+fix_expert1_truncated.py
+generate_council_supplement.py
+generate_critique_supplements.py
+Expert\ 3/expert3_training_data/
+Expert1/training_data/
+benchmark_data/
+data/benchmark/
+
+# Dev/debug run scripts (not in quick start)
+run_petri_eval.py
+run_batch_eval.py
+run_workflow_eval.py
+smoke_test.py
+export_report_html.py
+requirements-full.txt
+council/run_slm_demo.py
+
+# Old API (replaced by frontend_api/)
+api/
+
+# Stale root-level ChromaDB duplicate
+chroma_db_expert2/
