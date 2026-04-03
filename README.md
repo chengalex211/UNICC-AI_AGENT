@@ -457,7 +457,6 @@ Capstone/
 │       └── api/client.ts           # API calls + polling helpers
 │
 ├── docs/
-│   ├── system-technical-walkthrough.md   # Full technical deep-dive (this system, in Chinese)
 │   ├── system-overview.en.md
 │   └── system-overview.zh-CN.md
 │
