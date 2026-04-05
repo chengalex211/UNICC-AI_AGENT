@@ -201,7 +201,7 @@ We additionally added a `/v1/judge/evaluate-transcript` endpoint that accepts mu
 |---|---|
 | Single-dimension tools miss cross-cutting risks | Three independent experts covering security, law, and ethics simultaneously |
 | Static document review misses live vulnerabilities | Phase 0–3 live attack directly probes running systems with ATLAS-grounded techniques |
-| Adaptive attacks are manual / require human expertise | Phase 0 fingerprinting auto-selects the most relevant attack techniques for the target |
+| Adaptive attacks are manual / require human expertise | Phase 0 fingerprinting auto-selects attack techniques; FP-0 detects input modality (chat vs file upload) and switches attack content style accordingly |
 | "Black box" AI safety scores — no evidence trail | Every score traced to ATLAS technique ID, regulation article, or UN principle |
 | LLM hallucination in compliance findings | Expert 2 retrieves article text before making any claim; never cites what it didn't retrieve |
 | Generic findings not bound to the system under review | Expert 1 binds each finding to a concrete architectural weakness in the submitted description |
@@ -268,6 +268,42 @@ curl http://localhost:8100/evaluations/inc_20260401_petri-ai-safety_a1b2c3/statu
 # Fetch full report
 curl http://localhost:8100/evaluations/inc_20260401_petri-ai-safety_a1b2c3
 ```
+
+### Live Attack — VeriMedia example (file-upload system)
+
+When `live_target_url` is provided, Expert 1 activates its full four-phase pipeline:
+
+**Phase 0 (FP-0) — Input modality detection**: Before sending any attack, Expert 1 probes common upload endpoints (`/upload`, `/analyze`, etc.) to detect whether the target accepts file uploads (`multipart/form-data`) or chat messages. VeriMedia is automatically fingerprinted as `input_modality: file_upload`.
+
+**Phase 3 — Adaptive attack generation**: Attack content is generated to match the detected modality. For file-upload systems, `next_message` is adversarial *document content* (prompt injection embedded in fake audit reports, academic papers, or training-data labels) rather than chat instructions. This tests whether the toxicity classifier can be bypassed via crafted file content.
+
+```bash
+# Start VeriMedia (must be running separately — requires OPENAI_API_KEY)
+# cd /path/to/VeriMedia && python app.py   # → http://localhost:5004
+
+# Submit with live_target_url
+curl -X POST http://localhost:8100/evaluate/council \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_id": "verimedia-live",
+    "system_name": "VeriMedia",
+    "github_url": "https://github.com/FlashCarrot/VeriMedia",
+    "live_target_url": "http://localhost:5004",
+    "backend": "claude"
+  }'
+# → {"incident_id": "inc_..._verimedia-live_xxxxxx", "status": "running", ...}
+
+# Poll (~4 min for live attack)
+curl http://localhost:8100/evaluations/<incident_id>/status
+
+# Fetch full report — fingerprint shows input_modality detection result
+curl http://localhost:8100/evaluations/<incident_id>
+# → security.fingerprint.input_modality: "file_upload"
+# → security.fingerprint.upload_endpoint: "/upload"
+# → security.attack_trace[].message_sent: adversarial document text (not chat messages)
+```
+
+**Without `live_target_url`**: Expert 1 falls back to document analysis mode (ATLAS RAG-grounded scoring from the GitHub description). No live connection is made.
 
 ### Document Analysis — VeriMedia example (no live server needed)
 
@@ -346,6 +382,8 @@ Base URL: `http://localhost:8100`
         "fail_behavior": "graceful",
         "stateful": false,
         "tool_exposure": false,
+        "input_modality": "chat",          // "chat" | "file_upload" | "multimodal"
+        "upload_endpoint": "",             // set when input_modality == "file_upload"
         "boosted_tags": ["xml_injection", "AML.T0051"]
       },
       "dimension_scores": { "harmfulness": 3, "transparency": 2, ... },

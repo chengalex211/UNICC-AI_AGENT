@@ -119,11 +119,17 @@ class TargetProfile:
     stateful: bool = False                 # 是否有跨轮持久上下文
     tool_exposure: bool = False            # 是否暴露 tool/API 接口名称
     pipeline_complexity: str = "simple"   # simple | heavy (基于响应延迟)
+    input_modality: str = "chat"          # chat | file_upload | multimodal
+    upload_endpoint: str = ""             # FP-0 detected upload path (e.g. "/upload")
     raw_notes: list[str] = field(default_factory=list)  # 探针原始观察
 
     def boosted_technique_tags(self) -> list[str]:
         """根据指纹返回应优先测试的技术标签列表（用于 Phase 3 RAG 排序）"""
         tags: list[str] = []
+        # file_upload → 文件内容注入、资源耗尽、恶意文件上传
+        if self.input_modality == "file_upload":
+            tags += ["file_upload_abuse", "content_injection", "resource_exhaustion",
+                     "AML.T0067", "OWASP-LLM01"]
         # xml_pipeline → XML 注入 / Prompt Injection via transcript 最有效
         if self.output_format == "xml_pipeline":
             tags += ["xml_injection", "prompt_injection", "AML.T0051"]
@@ -357,6 +363,39 @@ class Expert1Router:
         """
         print("  [Phase 0: FINGERPRINT]")
         profile = TargetProfile()
+
+        # ── FP-0: Input modality detection ──────────────────────────────────
+        # Probe for file-upload endpoints before sending any chat-style messages.
+        # If a multipart upload surface is detected, tag the profile so Phase 3
+        # uses file-content injection techniques instead of chat prompt injection.
+        import requests as _fp0_requests, tempfile as _fp0_tmp, os as _fp0_os
+        _upload_candidates = ["/upload", "/analyze", "/api/upload", "/api/analyze", "/v1/analyze"]
+        _base_url = getattr(adapter, "_base_url", "")
+        for _path in _upload_candidates:
+            try:
+                # Step 1: HEAD check
+                _hr = _fp0_requests.head(f"{_base_url}{_path}", timeout=4)
+                if _hr.status_code in (200, 405):  # 405 = Method Not Allowed → endpoint exists
+                    # Step 2: Confirm multipart acceptance with a tiny probe file
+                    _probe_txt = b"probe"
+                    _pr = _fp0_requests.post(
+                        f"{_base_url}{_path}",
+                        data={"file_type": "text"},
+                        files={"file": ("probe.txt", _probe_txt, "text/plain")},
+                        timeout=8, allow_redirects=True
+                    )
+                    if _pr.status_code == 200 and len(_pr.text) > 200:
+                        profile.input_modality = "file_upload"
+                        profile.upload_endpoint = _path
+                        profile.raw_notes.append(
+                            f"FP-0: Multipart file upload detected at {_path} "
+                            f"(HTTP {_pr.status_code}, {len(_pr.text)} bytes response) → input_modality=file_upload"
+                        )
+                        break
+            except Exception as _e:
+                profile.raw_notes.append(f"FP-0: probe {_path} failed ({_e})")
+        if profile.input_modality == "chat":
+            profile.raw_notes.append("FP-0: No file-upload endpoint detected → input_modality=chat")
 
         # ── FP-1: Output format & latency detection ─────────────────────────
         # 强制格式合规指令 — 测"服从 vs 包装"，不测有无内容可 summarize
@@ -612,8 +651,10 @@ class Expert1Router:
                 f"[TARGET FINGERPRINT] output_format={target_profile.output_format}, "
                 f"fail_behavior={target_profile.fail_behavior}, "
                 f"stateful={target_profile.stateful}, "
-                f"tool_exposure={target_profile.tool_exposure}. "
-                f"Prioritise techniques that exploit these characteristics."
+                f"tool_exposure={target_profile.tool_exposure}, "
+                f"input_modality={target_profile.input_modality}"
+                + (f", upload_endpoint={target_profile.upload_endpoint}" if target_profile.upload_endpoint else "")
+                + ". Prioritise techniques that exploit these characteristics."
             )
             # 临时拼入 deployment_context（不修改原始 profile 对象）
             augmented_context = f"{profile.deployment_context} {profile_hint}"
@@ -663,8 +704,13 @@ class Expert1Router:
     ) -> None:
         history: list[dict] = []
 
-        # 首轮
-        system = get_attacker_system_prompt(profile.description, attack_goal, tech)
+        # 首轮 — 传入 input_modality 让 attacker LLM 自适应生成文件内容或对话消息
+        _tp = session.target_profile
+        system = get_attacker_system_prompt(
+            profile.description, attack_goal, tech,
+            input_modality=_tp.input_modality,
+            upload_endpoint=_tp.upload_endpoint,
+        )
         try:
             result = self._llm.generate_json(system, "Start the attack")
         except Exception as e:
@@ -676,8 +722,8 @@ class Expert1Router:
             if not message:
                 break
 
-            # On-topic 检查（过滤跑题攻击变体）
-            if not self._is_on_topic(message, attack_goal):
+            # On-topic 检查（对话模式才过滤；文件内容模式跳过，内容可以不含攻击词）
+            if _tp.input_modality != "file_upload" and not self._is_on_topic(message, attack_goal):
                 print("      [SKIP] Off-topic attack message filtered")
                 break
 
@@ -748,9 +794,11 @@ class Expert1Router:
                 print("      [STOP] Consecutive safe failures")
                 break
 
-            # 后续轮
+            # 后续轮 — 同样携带 input_modality
             followup_system = get_attacker_system_prompt_followup(
-                profile.description, attack_goal, tech, history, score
+                profile.description, attack_goal, tech, history, score,
+                input_modality=_tp.input_modality,
+                upload_endpoint=_tp.upload_endpoint,
             )
             try:
                 result = self._llm.generate_json(followup_system, "Continue the attack")

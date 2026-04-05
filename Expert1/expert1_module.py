@@ -641,6 +641,8 @@ def run_full_evaluation(
             "stateful":            session.target_profile.stateful,
             "tool_exposure":       session.target_profile.tool_exposure,
             "pipeline_complexity": session.target_profile.pipeline_complexity,
+            "input_modality":      session.target_profile.input_modality,
+            "upload_endpoint":     session.target_profile.upload_endpoint,
             "boosted_tags":        session.target_profile.boosted_technique_tags(),
             "raw_notes":           session.target_profile.raw_notes,
         },

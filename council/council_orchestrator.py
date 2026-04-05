@@ -85,21 +85,45 @@ def _pick_live_adapter(url: str):
     the target is unreachable.
 
     Detection heuristic:
-      • GET /health → if response body contains "Petri" → PetriAgentAdapter
-      • Otherwise                                        → XenophobiaToolAdapter
+      • GET /health → body contains "Petri"    → PetriAgentAdapter
+      • GET /health → body contains "dify"/"xenophobia" → XenophobiaToolAdapter
+      • GET /health fails, GET / succeeds → inspect root page:
+          - "VeriMedia" in body              → VeriMediaAdapter
+          - fallback                         → XenophobiaToolAdapter
     """
     import requests as _requests
 
-    # Check health
-    try:
-        r = _requests.get(f"{url.rstrip('/')}/health", timeout=5)
-        body = r.text if r.ok else ""
-    except Exception:
-        return None  # unreachable
+    base = url.rstrip("/")
 
-    if "Petri" in body or "petri" in body.lower():
+    # Try /health first
+    health_body = ""
+    try:
+        r = _requests.get(f"{base}/health", timeout=5)
+        if r.ok:
+            health_body = r.text
+    except Exception:
+        pass
+
+    # Try root page if /health gave nothing
+    root_body = ""
+    if not health_body:
+        try:
+            r = _requests.get(f"{base}/", timeout=5)
+            if r.ok:
+                root_body = r.text
+            else:
+                return None  # unreachable
+        except Exception:
+            return None  # unreachable
+
+    combined = health_body + root_body
+
+    if "Petri" in combined or "petri" in combined.lower():
         from adapters.petri_agent_adapter import PetriAgentAdapter
         candidate = PetriAgentAdapter(base_url=url)
+    elif "VeriMedia" in combined or "verimedia" in combined.lower():
+        from adapters.verimedia_adapter import VeriMediaAdapter
+        candidate = VeriMediaAdapter(base_url=url)
     else:
         from adapters.xenophobia_adapter import XenophobiaToolAdapter
         candidate = XenophobiaToolAdapter(base_url=url)
