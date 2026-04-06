@@ -251,7 +251,6 @@ class UNPrinciplesRetriever:
     """ChromaDB retriever for UN/UNESCO principles knowledge base."""
 
     def __init__(self):
-        import subprocess, sys as _sys
         db_path = Path(CHROMA_DIR)
 
         def _needs_rebuild() -> bool:
@@ -265,16 +264,21 @@ class UNPrinciplesRetriever:
                 return True
 
         if _needs_rebuild():
-            print("      [Expert 3] RAG index missing or stale — rebuilding…")
-            build_script = Path(__file__).parent / "expert3_rag" / "build_rag.py"
-            result = subprocess.run(
-                [_sys.executable, str(build_script)],
-                capture_output=True, text=True, timeout=180,
+            print("      [Expert 3] RAG index missing or stale — rebuilding (this takes 1-3 min on first run)…")
+            import importlib.util as _ilu
+            _spec = _ilu.spec_from_file_location(
+                "build_rag_expert3",
+                str(Path(__file__).parent / "expert3_rag" / "build_rag.py")
             )
-            if result.returncode != 0:
+            _mod = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_mod)
+            try:
+                _mod.build()
+                print("      [Expert 3] RAG index built successfully.")
+            except Exception as _build_err:
                 raise RuntimeError(
                     f"Expert 3 RAG build failed — run Expert 3/expert3_rag/build_rag.py manually.\n"
-                    f"Error: {result.stderr[:400]}"
+                    f"Error: {_build_err}"
                 )
         ef = embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name=EMBED_MODEL

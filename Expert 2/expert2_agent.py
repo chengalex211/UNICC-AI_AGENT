@@ -297,7 +297,6 @@ TOOLS = [
 
 class RegulatoryRetriever:
     def __init__(self):
-        import subprocess, sys as _sys
         db_path = Path(KNOWLEDGE_BASE)
 
         def _needs_rebuild() -> bool:
@@ -311,16 +310,21 @@ class RegulatoryRetriever:
                 return True
 
         if _needs_rebuild():
-            print("      [Expert 2] RAG index missing or stale — rebuilding…")
-            build_script = Path(__file__).parent / "build_rag_expert2.py"
-            result = subprocess.run(
-                [_sys.executable, str(build_script)],
-                capture_output=True, text=True, timeout=180,
+            print("      [Expert 2] RAG index missing or stale — rebuilding (this takes 1-3 min on first run)…")
+            import importlib.util as _ilu
+            _spec = _ilu.spec_from_file_location(
+                "build_rag_expert2",
+                str(Path(__file__).parent / "build_rag_expert2.py")
             )
-            if result.returncode != 0:
+            _mod = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_mod)
+            try:
+                _mod.build()
+                print("      [Expert 2] RAG index built successfully.")
+            except Exception as _build_err:
                 raise RuntimeError(
                     f"Expert 2 RAG build failed — run Expert 2/build_rag_expert2.py manually.\n"
-                    f"Error: {result.stderr[:400]}"
+                    f"Error: {_build_err}"
                 )
         ef = embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name=EMBED_MODEL

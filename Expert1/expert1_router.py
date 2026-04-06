@@ -1008,15 +1008,19 @@ Respond ONLY with this JSON (no extra text):
                     return True
 
             if _needs_rebuild():
-                print("      RAG index missing or stale — rebuilding…")
-                import subprocess, sys
-                build_script = _P(__file__).parent / "rag" / "build_rag_expert1.py"
-                result = subprocess.run(
-                    [sys.executable, str(build_script)],
-                    capture_output=True, text=True, timeout=120,
+                print("      RAG index missing or stale — rebuilding (this takes 1-3 min on first run)…")
+                import importlib.util as _ilu, sys as _sys
+                _spec = _ilu.spec_from_file_location(
+                    "build_rag_expert1",
+                    str(_P(__file__).parent / "rag" / "build_rag_expert1.py")
                 )
-                if result.returncode != 0:
-                    print(f"      RAG build failed: {result.stderr[:200]}")
+                _mod = _ilu.module_from_spec(_spec)
+                _spec.loader.exec_module(_mod)
+                try:
+                    _mod.build()
+                    print("      RAG index built successfully.")
+                except Exception as _build_err:
+                    print(f"      RAG build failed: {_build_err}")
                     return []
             client  = chromadb.PersistentClient(path=str(db_path))
             ef      = embedding_functions.SentenceTransformerEmbeddingFunction(
