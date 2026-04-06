@@ -1,13 +1,13 @@
 """
 build_rag_expert2.py
-Expert 2 RAG Knowledge Base — Ingestion Script
+Expert 2 RAG Knowledge Base - Ingestion Script
 
 读取 Ai_ACTS_ALL/ 下的 31 个 markdown 文件，自适应分块后存入 ChromaDB。
 
 分块策略（根据实际文件结构）：
-  GDPR P0 article 文件  → ## Article N 级别（条款级，最精确）
-  EU AI Act 文件        → ## Page N 级别，但内嵌检测 ### Article N 提取标签
-  NIST / OWASP 等       → ## Page N 级别（PDF页码转换）
+  GDPR P0 article 文件  -> ## Article N 级别（条款级，最精确）
+  EU AI Act 文件        -> ## Page N 级别，但内嵌检测 ### Article N 提取标签
+  NIST / OWASP 等       -> ## Page N 级别（PDF页码转换）
 
 Collection：expert2_legal_compliance
 Storage：   ./chroma_db_expert2/
@@ -32,7 +32,7 @@ EMBED_MODEL     = "sentence-transformers/all-MiniLM-L6-v2"
 AI_ACTS_DIR     = "Ai_ACTS_ALL"
 
 # ─── SOURCE FILE REGISTRY ─────────────────────────────────────────────────────
-# 格式：filename → (priority, jurisdiction, relevance_tags)
+# 格式：filename -> (priority, jurisdiction, relevance_tags)
 # priority: P0 = 核心强制引用，P1 = 补充参考
 
 SOURCE_REGISTRY = {
@@ -45,7 +45,7 @@ SOURCE_REGISTRY = {
     "EU_AI_Act_Annex_III_High-Risk_List.md":            ("P0", "EU_AI_Act",   "ai_governance, high_risk, risk_classification"),
     "EU_AI_Act_Annex_IV_Technical_Documentation.md":    ("P0", "EU_AI_Act",   "ai_governance, accountability, technical_documentation"),
     "EU_AI_Act_Recitals_1-182.md":                      ("P1", "EU_AI_Act",   "ai_governance"),
-    # GDPR P0 — core articles (article-level structure)
+    # GDPR P0 - core articles (article-level structure)
     "P0_Article_4_Definitions.md":                      ("P0", "GDPR",        "data_protection, definitions"),
     "P0_Article_5_Principles_relating_to_process.md":   ("P0", "GDPR",        "data_protection, data_principles"),
     "P0_Article_6_Lawfulness_of_processing.md":         ("P0", "GDPR",        "data_protection, lawfulness, consent"),
@@ -56,13 +56,13 @@ SOURCE_REGISTRY = {
     "P0_Chapter_II_Principles.md":                      ("P0", "GDPR",        "data_protection, data_principles"),
     "P0_Chapter_III_Data_Subject_Rights.md":            ("P0", "GDPR",        "data_protection, data_subject_rights"),
     "P0_Chapter_IV_Controller_Processor.md":            ("P0", "GDPR",        "data_protection, accountability"),
-    # GDPR P1 — supplementary chapters
+    # GDPR P1 - supplementary chapters
     "P1_Article_13_Information_to_be_provided_-_t.md":  ("P1", "GDPR",        "data_protection, transparency"),
     "P1_Article_14_Information_to_be_provided_-_t.md":  ("P1", "GDPR",        "data_protection, transparency"),
     "P1_Article_89_Safeguards_for_processing_for_.md":  ("P1", "GDPR",        "data_protection"),
     "P1_Chapter_VI_Supervisory_Authorities.md":         ("P1", "GDPR",        "data_protection, accountability"),
     "P1_Chapter_VIII_Remedies_Penalties.md":            ("P1", "GDPR",        "data_protection, enforcement"),
-    # GDPR P2 — general provisions & recitals
+    # GDPR P2 - general provisions & recitals
     "P2_Chapter_I_General_Provisions.md":               ("P1", "GDPR",        "data_protection, definitions"),
     "P2_Recital_71_Automated_Decision_Making.md":       ("P0", "GDPR",        "data_protection, automated_decision, profiling"),
     "P2_Recitals_1-173.md":                             ("P1", "GDPR",        "data_protection"),
@@ -114,10 +114,10 @@ def normalize_section(header: str, body: str, jurisdiction: str, filename: str =
     把 section 名标准化为语义化格式。
 
     规则（按优先级）：
-    1. header 本身已是 Article N 格式 → 直接用（GDPR 专文件走这条）
-    2. body 里有独立标题行 '^Article N' → 用（真正的条款开头）
+    1. header 本身已是 Article N 格式 -> 直接用（GDPR 专文件走这条）
+    2. body 里有独立标题行 '^Article N' -> 用（真正的条款开头）
        注意：不用"第一个出现的 Article N"，那可能是交叉引用
-    3. NIST 格式：GOVERN/MAP/MEASURE/MANAGE + 数字 → 用具体编号
+    3. NIST 格式：GOVERN/MAP/MEASURE/MANAGE + 数字 -> 用具体编号
     4. NIST/UNESCO/UN/OWASP：用 body 第一行作为标识
     5. EU AI Act / GDPR 按页切割的大文件：保留 Page N，
        但加上来自文件名提取的条款范围作为上下文前缀
@@ -145,19 +145,19 @@ def normalize_section(header: str, body: str, jurisdiction: str, filename: str =
     # 5. 页码型 header（Page N）但来自 EU AI Act / GDPR 大文件
     #    加文件名里的条款范围或章节名作为前缀，保持准确性
     if re.match(r"^Page\s+\d+$", header.strip(), re.IGNORECASE):
-        # 从文件名提取条款范围，如 "Articles_6-51" → "Art.6-51"
+        # 从文件名提取条款范围，如 "Articles_6-51" -> "Art.6-51"
         art_range = re.search(r"Article[s]?[_-](\d+[-–]\d+)", filename, re.IGNORECASE)
         if art_range:
             return f"Art.{art_range.group(1)} / {header.strip()}"
-        # 从文件名提取单个条款，如 "Article_22" → "Art.22"
+        # 从文件名提取单个条款，如 "Article_22" -> "Art.22"
         single_art = re.search(r"Article[_-](\d+)", filename, re.IGNORECASE)
         if single_art:
             return f"Article {single_art.group(1)}"
-        # 从文件名提取章节编号，如 "Chapter_II" → "Ch.II"
+        # 从文件名提取章节编号，如 "Chapter_II" -> "Ch.II"
         chapter = re.search(r"Chapter[_-]([IVX]+)", filename, re.IGNORECASE)
         if chapter:
             return f"Ch.{chapter.group(1)} / {header.strip()}"
-        # 从文件名提取 Recitals，如 "Recitals_1-173" → "Recitals"
+        # 从文件名提取 Recitals，如 "Recitals_1-173" -> "Recitals"
         if re.search(r"Recital", filename, re.IGNORECASE):
             return f"Recitals / {header.strip()}"
         return header.strip()
@@ -171,7 +171,7 @@ def normalize_section(header: str, body: str, jurisdiction: str, filename: str =
 def chunk_file(filepath: Path, priority: str, jurisdiction: str, relevance: str) -> list[dict]:
     """
     自适应分块策略：
-    - 如果文件有 ### Article N 级别 header → 优先按 ### 切割（精确到条款）
+    - 如果文件有 ### Article N 级别 header -> 优先按 ### 切割（精确到条款）
     - 否则退化到 ## 级别切割（Page N 级，加文件名前缀保持诚实）
     """
     text = filepath.read_text(encoding="utf-8")
@@ -273,7 +273,7 @@ def make_chunk_id(source: str, section: str, index: int) -> str:
 
 def build() -> None:
     print("=" * 60)
-    print("Expert 2 RAG — Building Legal Compliance Knowledge Base")
+    print("Expert 2 RAG - Building Legal Compliance Knowledge Base")
     print("=" * 60)
 
     base = Path(__file__).parent
@@ -357,7 +357,7 @@ def build() -> None:
         )
         print(f"  Ingested batch {batch_start // batch_size + 1}: {len(batch)} chunks")
 
-    print(f"\n✓ {len(all_chunks)} chunks → '{COLLECTION_NAME}'")
+    print(f"\n[OK] {len(all_chunks)} chunks -> '{COLLECTION_NAME}'")
     print(f"  Storage: {chroma_path}")
 
     # ── 简要统计 ──────────────────────────────────────────────────────────────

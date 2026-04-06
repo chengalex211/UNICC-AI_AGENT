@@ -10,6 +10,11 @@ set -e
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 
+# Force UTF-8 output encoding so build scripts with Unicode chars work on
+# Windows (default GBK) and other non-UTF-8 locales.
+export PYTHONIOENCODING=utf-8
+export PYTHONUTF8=1
+
 # ── Step 1: Pre-download embedding model ─────────────────────────────────────
 echo "[start] Warming up sentence-transformers model cache…"
 python3 -c "

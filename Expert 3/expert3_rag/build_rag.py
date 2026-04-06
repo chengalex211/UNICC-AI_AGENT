@@ -1,6 +1,6 @@
 """
 build_rag.py
-Expert 3 RAG Knowledge Base — Ingestion Script
+Expert 3 RAG Knowledge Base - Ingestion Script
 
 Chunks the three UN/UNESCO markdown files by section (## headers),
 embeds each chunk with all-MiniLM-L6-v2, and stores everything in a
@@ -60,7 +60,7 @@ def chunk_by_sections(filepath: Path) -> list[dict]:
 
     chunks = []
 
-    # Preamble (before first ## header) — treat as a single chunk titled "Overview"
+    # Preamble (before first ## header) - treat as a single chunk titled "Overview"
     preamble = parts[0].strip()
     if preamble:
         chunks.append({
@@ -110,7 +110,7 @@ def make_chunk_id(source: str, section: str) -> str:
 
 def build() -> None:
     print("=" * 55)
-    print("Expert 3 RAG — Building Knowledge Base")
+    print("Expert 3 RAG - Building Knowledge Base")
     print("=" * 55)
 
     # Validate source files
@@ -166,7 +166,7 @@ def build() -> None:
 
     collection.add(ids=ids, documents=documents, metadatas=metadatas)
 
-    print(f"\n✓ Ingested {len(ids)} chunks into '{COLLECTION_NAME}'")
+    print(f"\n[OK] Ingested {len(ids)} chunks into '{COLLECTION_NAME}'")
     print(f"  Persistent storage: {chroma_path}")
     print("\nDone. Run test_rag.py to verify retrieval.")
 

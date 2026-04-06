@@ -1,6 +1,6 @@
 """
 rag/build_rag_expert1.py
-Expert 1 RAG — Two-Collection Knowledge Base Builder
+Expert 1 RAG - Two-Collection Knowledge Base Builder
 
 Collection 1: expert1_attack_techniques
   - ATLAS 61个技术（LLM/AI Agent 相关）
@@ -167,13 +167,13 @@ def build_collection(
         )
         print(f"    Ingested batch {start // batch_size + 1}: {len(batch)} chunks")
 
-    print(f"  ✓ {len(all_chunks)} chunks → '{collection_name}'")
+    print(f"  [OK] {len(all_chunks)} chunks -> '{collection_name}'")
     return len(all_chunks)
 
 
 def build():
     print("=" * 60)
-    print("Expert 1 RAG — Building Attack Knowledge Base")
+    print("Expert 1 RAG - Building Attack Knowledge Base")
     print("=" * 60)
 
     client   = chromadb.PersistentClient(path=CHROMA_DIR)
