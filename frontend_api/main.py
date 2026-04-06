@@ -46,9 +46,27 @@ EXPERT1_DIR = BASE_DIR / "Expert1"
 # ── In-memory evaluation status store ────────────────────────────────────────
 # Maps incident_id → {"status": "running"|"complete"|"failed",
 #                      "started_at": float, "elapsed_seconds": float,
+#                      "phase": str, "progress_pct": int,
 #                      "error": str|None}
+#
+# progress_pct milestones (approximate, based on observed timing):
+#   0  → request received
+#  10  → repo analysis complete
+#  20  → experts started
+#  50  → all experts complete
+#  75  → critiques complete
+#  90  → arbitration complete
+# 100  → evaluation complete
 _eval_status: dict[str, dict] = {}
 _eval_status_lock = _threading.Lock()
+
+
+def _set_phase(incident_id: str, phase: str, pct: int) -> None:
+    """Update progress phase + percentage for a running evaluation."""
+    with _eval_status_lock:
+        if incident_id in _eval_status:
+            _eval_status[incident_id]["phase"] = phase
+            _eval_status[incident_id]["progress_pct"] = pct
 
 
 def _resolve_backend(requested: str, vllm_base_url: str = "http://localhost:8000") -> str:
@@ -1079,6 +1097,7 @@ def _run_council_evaluation(
         from council.council_orchestrator import CouncilOrchestrator
 
         # Auto-extract system description from GitHub URL if not provided
+        _set_phase(incident_id, "Analysing repository…", 5)
         resolved_description = request.system_description or ""
         resolved_system_name = request.system_name or request.agent_id
         if not resolved_description.strip() and request.github_url.strip():
@@ -1096,6 +1115,7 @@ def _run_council_evaluation(
                     resolved_system_name = repo_info.get("system_name", resolved_system_name) or resolved_system_name
             except Exception as _repo_err:
                 print(f"[Council API] WARNING: repo analysis failed: {_repo_err}")
+        _set_phase(incident_id, "Repository analysis complete — starting experts…", 15)
 
         if not resolved_description.strip():
             raise ValueError(
@@ -1121,7 +1141,11 @@ def _run_council_evaluation(
             vllm_base_url=request.vllm_base_url,
             vllm_model=request.vllm_model,
         )
-        report = orch.evaluate(submission)
+
+        def _on_progress(phase: str, pct: int) -> None:
+            _set_phase(incident_id, phase, pct)
+
+        report = orch.evaluate(submission, on_progress=_on_progress)
         elapsed = _time.time() - started
         with _eval_status_lock:
             _eval_status[incident_id] = {
@@ -1206,6 +1230,8 @@ def evaluate_council(
             "status": "running",
             "started_at": _time.time(),
             "elapsed_seconds": 0,
+            "phase": "Starting evaluation…",
+            "progress_pct": 0,
             "error": None,
         }
 
@@ -1300,6 +1326,8 @@ def get_evaluation_status(incident_id: str) -> dict:
         "incident_id": incident_id,
         "status": info["status"],
         "elapsed_seconds": elapsed,
+        "phase": info.get("phase", ""),
+        "progress_pct": 100 if info["status"] == "complete" else info.get("progress_pct", 0),
         "error": info.get("error"),
         "result_url": f"/evaluations/{incident_id}" if info["status"] == "complete" else None,
     }

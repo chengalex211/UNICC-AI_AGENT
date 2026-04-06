@@ -29,6 +29,8 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [liveLog, setLiveLog]   = useState<AuditEvent[]>([])
   const [logOpen, setLogOpen]   = useState(true)
+  const [progressPct, setProgressPct] = useState(0)
+  const [progressPhase, setProgressPhase] = useState('Starting evaluation…')
   const logEndRef               = useRef<HTMLDivElement>(null)
   const pollRef                 = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -109,6 +111,8 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
 
   const startPolling = () => {
     setLiveLog([])
+    setProgressPct(0)
+    setProgressPhase('Starting evaluation…')
     pollRef.current = setInterval(async () => {
       try {
         const events = await getRecentAudit(30)
@@ -138,9 +142,15 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
         vllm_model: import.meta.env.VITE_VLLM_MODEL || 'meta-llama/Meta-Llama-3-70B-Instruct',
         live_target_url: form.live_target_url.trim() || undefined,
       }
-      // submitAndWait: POST returns immediately, then polls /status every 5 s
-      const report = await submitAndWait(payload)
+      const report = await submitAndWait(payload, (_elapsed, status) => {
+        if (status) {
+          setProgressPct(status.progress_pct ?? 0)
+          if (status.phase) setProgressPhase(status.phase)
+        }
+      })
       stopPolling()
+      setProgressPct(100)
+      setProgressPhase('Complete')
       // Final poll to capture completion events
       try { setLiveLog(await getRecentAudit(30)) } catch { /* ignore */ }
       onSubmit(report)
@@ -441,6 +451,20 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
                 <div className="flex flex-col items-center py-4 gap-3">
                   <div className="w-8 h-8 border-2 border-apple-blue border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm text-apple-gray-500">Running Council evaluation (3 Experts + Critiques + Arbitration)…</p>
+                </div>
+
+                {/* Progress bar */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[11px] text-apple-gray-400 truncate max-w-[80%]">{progressPhase}</span>
+                    <span className="text-[11px] font-semibold text-apple-blue tabular-nums">{progressPct}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-apple-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-apple-blue rounded-full transition-all duration-700 ease-out"
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
                 </div>
 
                 {/* Live audit log */}

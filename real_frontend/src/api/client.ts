@@ -102,6 +102,8 @@ export interface EvaluationStatusResponse {
   incident_id: string
   status: 'running' | 'complete' | 'failed' | 'unknown'
   elapsed_seconds: number | null
+  phase: string
+  progress_pct: number
   error: string | null
   result_url: string | null
 }
@@ -138,7 +140,7 @@ export async function getEvaluationStatus(
  */
 export async function submitAndWait(
   body: CouncilEvaluateRequest,
-  onProgress?: (elapsed: number) => void,
+  onProgress?: (elapsed: number, status?: EvaluationStatusResponse) => void,
   maxWaitMs = 15 * 60 * 1000,
 ): Promise<CouncilReportResponse> {
   const submit = await submitCouncilEvaluation(body)
@@ -149,7 +151,7 @@ export async function submitAndWait(
     await new Promise(r => setTimeout(r, 5000))
     const status = await getEvaluationStatus(incidentId)
     if (onProgress && status.elapsed_seconds != null) {
-      onProgress(status.elapsed_seconds)
+      onProgress(status.elapsed_seconds, status)
     }
     if (status.status === 'complete') {
       return getEvaluationByIncident(incidentId)

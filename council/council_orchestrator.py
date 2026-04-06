@@ -520,7 +520,11 @@ class CouncilOrchestrator:
         else:
             self.vllm_client = None
 
-    def evaluate(self, submission: AgentSubmission) -> CouncilReport:
+    def evaluate(
+        self,
+        submission: AgentSubmission,
+        on_progress=None,   # optional callable(phase: str, pct: int)
+    ) -> CouncilReport:
         """
         Full evaluation pipeline.
 
@@ -529,7 +533,15 @@ class CouncilOrchestrator:
         3. Generate six Critiques in parallel (Round 2)
         4. Arbitration layer computes final decision (pure code)
         5. Return CouncilReport
+
+        on_progress(phase, pct) is called at key milestones if provided.
         """
+        def _progress(phase: str, pct: int) -> None:
+            if on_progress:
+                try:
+                    on_progress(phase, pct)
+                except Exception:
+                    pass
         session_id = str(uuid.uuid4())
         timestamp  = datetime.now(timezone.utc).isoformat()
         round1_span = None
@@ -551,6 +563,7 @@ class CouncilOrchestrator:
             agent_id=submission.agent_id,
         )
 
+        _progress("Running 3 experts in parallel…", 20)
         # ── Round 1: parallel Expert execution ────────────────────────────────
         print("[Council] Round 1: running three Experts in parallel...")
         round1_start = time.perf_counter()
@@ -622,6 +635,7 @@ class CouncilOrchestrator:
             duration_ms=int((time.perf_counter() - round1_start) * 1000),
         )
 
+        _progress("Experts complete — generating 6 cross-critiques…", 55)
         # ── Round 2: parallel Critique generation ──────────────────────────────
         print("[Council] Round 2: generating 6 Critiques in parallel...")
         round2_start = time.perf_counter()
@@ -668,6 +682,7 @@ class CouncilOrchestrator:
         )
 
         # ── Arbitration layer (pure code) ──────────────────────────────────────
+        _progress("Critiques complete — running arbitration…", 80)
         print("[Council] Arbitration: computing final decision...")
         decision = arbitrate(reports, critiques)
         print(
