@@ -299,8 +299,19 @@ class RegulatoryRetriever:
     def __init__(self):
         import subprocess, sys as _sys
         db_path = Path(KNOWLEDGE_BASE)
-        if not db_path.exists() or not (db_path / "chroma.sqlite3").exists():
-            print("      [Expert 2] RAG index missing — rebuilding (first-time setup)…")
+
+        def _needs_rebuild() -> bool:
+            if not db_path.exists() or not (db_path / "chroma.sqlite3").exists():
+                return True
+            try:
+                _c = chromadb.PersistentClient(path=str(db_path))
+                names = [col.name for col in _c.list_collections()]
+                return COLLECTION_NAME not in names
+            except Exception:
+                return True
+
+        if _needs_rebuild():
+            print("      [Expert 2] RAG index missing or stale — rebuilding…")
             build_script = Path(__file__).parent / "build_rag_expert2.py"
             result = subprocess.run(
                 [_sys.executable, str(build_script)],

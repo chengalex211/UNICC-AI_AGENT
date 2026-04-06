@@ -996,8 +996,19 @@ Respond ONLY with this JSON (no extra text):
             from chromadb.utils import embedding_functions
             from pathlib import Path as _P
             db_path = _P(__file__).parent / "rag" / "chroma_db_expert1"
-            if not db_path.exists() or not (db_path / "chroma.sqlite3").exists():
-                print("      RAG index missing — rebuilding (first-time setup)…")
+            def _needs_rebuild() -> bool:
+                if not db_path.exists() or not (db_path / "chroma.sqlite3").exists():
+                    return True
+                # Also rebuild if collections are missing or unreadable (version mismatch)
+                try:
+                    _c = chromadb.PersistentClient(path=str(db_path))
+                    names = [col.name for col in _c.list_collections()]
+                    return not any("expert1" in n for n in names)
+                except Exception:
+                    return True
+
+            if _needs_rebuild():
+                print("      RAG index missing or stale — rebuilding…")
                 import subprocess, sys
                 build_script = _P(__file__).parent / "rag" / "build_rag_expert1.py"
                 result = subprocess.run(
