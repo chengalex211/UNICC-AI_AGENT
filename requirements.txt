@@ -1,5 +1,4 @@
-# UNICC Council — core runtime dependencies (sandbox/CI safe)
-# Heavy ML deps (chromadb, sentence-transformers, torch) are in requirements-full.txt
+# UNICC Council — runtime dependencies
 fastapi>=0.100.0
 uvicorn[standard]>=0.22.0
 pydantic>=2.0.0
@@ -9,3 +8,6 @@ httpx>=0.25.0
 gitpython>=3.1.0
 requests>=2.31.0
 reportlab>=4.0.0
+# RAG pipeline — required for Expert 1 ATLAS ChromaDB retrieval
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
