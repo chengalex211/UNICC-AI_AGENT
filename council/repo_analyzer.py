@@ -373,6 +373,14 @@ def _call_llm(
     vllm_model: str,
     anthropic_api_key: Optional[str],
 ) -> str:
+    # Mock mode — no LLM call, return a placeholder description
+    if backend == "mock" or os.environ.get("UNICC_MOCK_MODE", "").strip() in ("1", "true", "yes"):
+        return (
+            '{"system_description": "(mock) Repository analysis skipped in mock mode.", '
+            '"capabilities": [], "data_sources": [], '
+            '"human_oversight": "unknown", "category": "unknown", "deploy_zone": "unknown"}'
+        )
+
     if backend == "vllm":
         from council.slm_backends import VLLMChatClient
         client = VLLMChatClient(base_url=vllm_base_url, model=vllm_model)
@@ -387,7 +395,11 @@ def _call_llm(
         import anthropic
         key = anthropic_api_key or os.environ.get("ANTHROPIC_API_KEY")
         if not key:
-            raise EnvironmentError("ANTHROPIC_API_KEY is not set.")
+            raise EnvironmentError(
+                "ANTHROPIC_API_KEY is not set. "
+                "Set it via: export ANTHROPIC_API_KEY=your_key_here  "
+                "or add it to Expert1/.env"
+            )
         claude = anthropic.Anthropic(api_key=key)
         response = claude.messages.create(
             model="claude-sonnet-4-6",

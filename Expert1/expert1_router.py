@@ -851,7 +851,7 @@ class Expert1Router:
         if not SCORES_PATH.exists():
             raise FileNotFoundError("atlas_dimension_scores.json not found")
 
-        score_db = _json.loads(SCORES_PATH.read_text())["entries"]
+        score_db = _json.loads(SCORES_PATH.read_text(encoding="utf-8"))["entries"]
 
         # ── Step 1: RAG — retrieve top-K relevant ATLAS techniques ────────────
         print("    [1/3] RAG retrieval from ATLAS ChromaDB…")
@@ -995,8 +995,19 @@ Respond ONLY with this JSON (no extra text):
             import chromadb
             from chromadb.utils import embedding_functions
             from pathlib import Path as _P
-            db_path = str(_P(__file__).parent / "rag" / "chroma_db_expert1")
-            client  = chromadb.PersistentClient(path=db_path)
+            db_path = _P(__file__).parent / "rag" / "chroma_db_expert1"
+            if not db_path.exists() or not (db_path / "chroma.sqlite3").exists():
+                print("      RAG index missing — rebuilding (first-time setup)…")
+                import subprocess, sys
+                build_script = _P(__file__).parent / "rag" / "build_rag_expert1.py"
+                result = subprocess.run(
+                    [sys.executable, str(build_script)],
+                    capture_output=True, text=True, timeout=120,
+                )
+                if result.returncode != 0:
+                    print(f"      RAG build failed: {result.stderr[:200]}")
+                    return []
+            client  = chromadb.PersistentClient(path=str(db_path))
             ef      = embedding_functions.SentenceTransformerEmbeddingFunction(
                 model_name="sentence-transformers/all-MiniLM-L6-v2"
             )

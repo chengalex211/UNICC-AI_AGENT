@@ -1,6 +1,6 @@
 import React, { useEffect, useState, type FC } from 'react'
 import { getEvaluationByIncident, type CouncilReportResponse } from '../api/client'
-import { buildHumanRationale, buildHumanConditions } from '../utils/mapCouncilReport'
+import { buildHumanRationale, buildHumanConditions, citationToString } from '../utils/mapCouncilReport'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -52,16 +52,7 @@ function extractFindings(r: any): string[] {
 }
 
 function extractRefs(r: any): string[] {
-  const norm = (arr: any[]) => arr.map((c: any) => {
-    if (typeof c === 'string') return c
-    if (c?.article) {
-      const fw = c.framework ? `${c.framework} | ` : ''
-      const rel = c.relevance != null ? ` (relevance: ${c.relevance})` : ''
-      return `${fw}${c.article}${rel}`
-    }
-    if (c?.id && c?.name) return `${c.id} — ${c.name}${c.relevance != null ? ` (relevance: ${c.relevance})` : ''}`
-    return c?.name ?? c?.id ?? c?.title ?? JSON.stringify(c)
-  })
+  const norm = (arr: any[]) => arr.map(citationToString)
   if (Array.isArray(r?.framework_refs) && r.framework_refs.length) return norm(r.framework_refs)
   if (Array.isArray(r?.regulatory_citations) && r.regulatory_citations.length) return norm(r.regulatory_citations)
   if (Array.isArray(r?.evidence_references) && r.evidence_references.length) return norm(r.evidence_references)

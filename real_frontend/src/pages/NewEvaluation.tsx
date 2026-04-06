@@ -18,7 +18,9 @@ const DEPLOY_ZONES = [
 
 const defaultBackend = (): 'claude' | 'vllm' => {
   const v = import.meta.env.VITE_COUNCIL_BACKEND
-  return v === 'claude' ? 'claude' : 'vllm'
+  // Default to 'claude' so the backend can gracefully fall back to mock
+  // when no API key is set, instead of attempting a vLLM connection first.
+  return v === 'vllm' ? 'vllm' : 'claude'
 }
 
 type InputMode = 'paste' | 'file' | 'repo'
