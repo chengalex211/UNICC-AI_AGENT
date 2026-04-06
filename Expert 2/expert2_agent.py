@@ -391,7 +391,7 @@ class Expert2Agent:
         ]
 
         search_rounds = 0
-        retrieved_docs = []   # track what was retrieved across all rounds
+        retrieved_docs: dict[str, dict] = {}   # article → rich citation object (deduped by article name)
 
         # Agentic loop
         while True:
@@ -468,7 +468,15 @@ class Expert2Agent:
                     framework_filter = tool_input.get("framework_filter", "")
 
                     chunks = self.retriever.search(query, framework_filter)
-                    retrieved_docs.extend([c["article"] for c in chunks])
+                    for c in chunks:
+                        key = c["article"]
+                        if key not in retrieved_docs or c["score"] > retrieved_docs[key]["relevance"]:
+                            retrieved_docs[key] = {
+                                "framework":  c.get("framework", ""),
+                                "article":    c["article"],
+                                "relevance":  round(float(c["score"]), 3),
+                                "excerpt":    c.get("text", "")[:300].strip(),
+                            }
 
                     result_text = self.retriever.format_chunks_for_prompt(chunks)
                     if not result_text.strip():
@@ -490,7 +498,9 @@ class Expert2Agent:
                 elif tool_name == "produce_assessment":
                     assessment_done = True
                     final_assessment = tool_input
-                    final_assessment["retrieved_articles"] = list(set(retrieved_docs))
+                    final_assessment["retrieved_articles"] = sorted(
+                        retrieved_docs.values(), key=lambda x: -x["relevance"]
+                    )
                     final_assessment["search_rounds_used"] = search_rounds
                     # Derive standard recommendation from overall_compliance
                     _oc = final_assessment.get("overall_compliance",
@@ -522,12 +532,21 @@ class Expert2Agent:
                         final_assessment.get("compliance_gaps", []))
                 )
                 # Ensure regulatory_citations is populated.
-                # Claude sometimes returns an empty list even when articles were retrieved.
-                # Fall back to the retrieved_articles list (ChromaDB section metadata).
-                if not final_assessment.get("regulatory_citations"):
-                    final_assessment["regulatory_citations"] = list(
-                        final_assessment.get("retrieved_articles", [])
-                    )
+                # Claude sometimes returns an empty list even when articles were retrieved,
+                # or returns plain strings instead of rich objects.
+                # Normalize: strings → look up in retrieved_articles; fall back to retrieved_articles.
+                raw_cits = final_assessment.get("regulatory_citations", [])
+                rich_map = {c["article"]: c for c in final_assessment.get("retrieved_articles", [])
+                            if isinstance(c, dict)}
+                normalized: list = []
+                for cit in raw_cits:
+                    if isinstance(cit, dict):
+                        normalized.append(cit)
+                    elif isinstance(cit, str):
+                        normalized.append(rich_map.get(cit, {"article": cit, "framework": "", "relevance": 0.0, "excerpt": ""}))
+                if not normalized:
+                    normalized = list(final_assessment.get("retrieved_articles", []))
+                final_assessment["regulatory_citations"] = normalized
                 return final_assessment
 
         raise ValueError(f"Exceeded max search rounds ({MAX_SEARCH_ROUNDS}) without produce_assessment.")
@@ -618,6 +637,7 @@ def build_training_sample(system_description: str, assessment: dict) -> dict:
                                     assessment.get("compliance_gaps", []))),
 
         "recommendations":      assessment.get("recommendations", {"must": [], "should": [], "could": []}),
+        "retrieved_articles":   assessment.get("retrieved_articles", []),
         "regulatory_citations": assessment.get("regulatory_citations",
                                     assessment.get("retrieved_articles", [])),
 
