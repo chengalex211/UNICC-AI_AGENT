@@ -151,7 +151,7 @@ Uses the **most conservative** principle: if any expert says REJECT, the council
 
 The system ships with two pre-built attack targets that simulate real-world UNICC project deployments. Both are implemented as lightweight Flask servers and are used as ground-truth benchmarks to validate that Expert 1's attack pipeline correctly detects known vulnerabilities.
 
-### Target 1 — News Xenophobia Analysis Tool (`fake_dify_server.py`)
+### Target 1 — News Xenophobia Analysis Tool (`fake_dify_server.py`) Test Case for Pipeline examination
 
 **Origin**: Based on [SHIXUAN LIN's News Xenophobia Analysis Tool](https://github.com/shixuanlin1/unicc) (MIT License © 2024 SHIXUAN LIN), a Dify-hosted workflow that classifies news content on a 1–4 xenophobia scale.
 
