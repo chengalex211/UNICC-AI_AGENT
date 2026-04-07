@@ -218,9 +218,11 @@ We additionally added a `/v1/judge/evaluate-transcript` endpoint that accepts mu
 
 ### Requirements
 
-- Python 3.10+
+- Python 3.10+ (macOS / Linux / Windows)
 - Node.js 18+
 - One of: `ANTHROPIC_API_KEY` (Claude) **or** a running vLLM server
+
+> **Windows note**: `start.sh` sets `PYTHONIOENCODING=utf-8` and `PYTHONUTF8=1` automatically. Run it via Git Bash or WSL.
 
 ### Run
 
@@ -235,6 +237,9 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 # 3. Start backend
 bash start.sh          # → http://localhost:8100
+# On first run, start.sh automatically builds all three Expert RAG indexes
+# (ChromaDB for ATLAS, regulatory corpus, and UN principles — ~30–60 s).
+# Subsequent starts detect existing indexes and skip the build step.
 
 # 4. Start frontend (separate terminal)
 cd real_frontend && npm install && npm run dev   # → http://localhost:5173
@@ -459,7 +464,8 @@ Capstone/
 │       ├── petri_agent_adapter.py  # Petri compliance judge adapter
 │       ├── petri_real_server.py    # Real Petri architecture simulation (Flask)
 │       ├── xenophobia_adapter.py   # Dify-based xenophobia tool adapter
-│       └── fake_dify_server.py     # Dify simulation server (Flask)
+│       ├── fake_dify_server.py     # Dify simulation server (Flask)
+│       └── verimedia_adapter.py    # VeriMedia file-upload adapter (multipart/form-data)
 │
 ├── Expert 2/                       # Governance & Compliance Expert
 │   ├── expert2_agent.py            # Agentic RAG compliance assessor
