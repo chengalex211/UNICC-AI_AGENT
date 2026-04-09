@@ -52,11 +52,40 @@ LAYER_MAP: dict[str, list[tuple[str, float]]] = {
 }
 
 # ── Maturity multiplier ────────────────────────────────────────────────────────
+# Keys match the exact values used in ATLAS.yaml (demonstrated / realized / feasible).
 MATURITY_MULT = {
-    "demonstrated": 1.5,   # has real-world evidence
-    "emerging":     1.0,
-    "theoretical":  0.7,
+    "demonstrated": 1.5,   # real-world evidence confirmed
+    "realized":     1.3,   # observed in the wild, not yet widespread
+    "feasible":     0.9,   # technically possible, not yet observed
 }
+
+# ── Tactic → attack layer inference ───────────────────────────────────────────
+# ATLAS.yaml has no "attack_layer" field; infer it from tactic IDs instead.
+TACTIC_TO_LAYER: dict[str, str] = {
+    "AML.TA0007": "application",        # Defense Evasion
+    "AML.TA0004": "application",        # Initial Access
+    "AML.TA0005": "application",        # Execution
+    "AML.TA0000": "model",              # AI Model Access
+    "AML.TA0001": "model",              # AI Attack Staging
+    "AML.TA0006": "model",              # Persistence
+    "AML.TA0011": "model",              # Impact
+    "AML.TA0009": "model",              # Collection
+    "AML.TA0010": "model",              # Exfiltration
+    "AML.TA0012": "model",              # Privilege Escalation
+    "AML.TA0013": "model",              # Credential Access
+    "AML.TA0002": "social_engineering", # Reconnaissance
+    "AML.TA0003": "social_engineering", # Resource Development
+    "AML.TA0014": "social_engineering", # C2
+    "AML.TA0015": "social_engineering", # Lateral Movement
+    "AML.TA0008": "mixed",              # Discovery
+}
+
+
+def infer_layer(tactics: list[str]) -> str:
+    for tid in tactics:
+        if tid in TACTIC_TO_LAYER:
+            return TACTIC_TO_LAYER[tid]
+    return "mixed"
 
 # ── Humanitarian risk (case studies only) ─────────────────────────────────────
 HUMANITARIAN_BOOST = {
@@ -74,12 +103,13 @@ def clamp(v: float) -> int:
     return max(1, min(5, round(v)))
 
 
-def score_technique(tech: dict) -> dict:
+def score_technique(tech: dict, tactics: list[str] | None = None) -> dict:
     scores = base_scores()
-    tactics = tech.get("tactics", [])
-    layer   = tech.get("attack_layer", tech.get("layer", "mixed"))
-    maturity = tech.get("maturity", "emerging")
-    mult    = MATURITY_MULT.get(maturity, 1.0)
+    if tactics is None:
+        tactics = tech.get("tactics", [])
+    layer    = infer_layer(tactics)
+    maturity = tech.get("maturity", "feasible")
+    mult     = MATURITY_MULT.get(maturity, 1.0)
 
     # Tactic contributions
     for tactic_id in tactics:
@@ -132,35 +162,51 @@ def main():
 
     lookup: dict[str, dict] = {}
 
+    # Build parent-tactics lookup for subtechnique inheritance.
+    # Subtechniques in ATLAS.yaml have no "tactics" field of their own.
+    parent_tactics: dict[str, list[str]] = {
+        t["id"]: t.get("tactics", [])
+        for t in techniques
+        if not t.get("subtechnique-of")
+    }
+
     # ── Score techniques ───────────────────────────────────────────────────────
     print(f"Scoring {len(techniques)} techniques…")
     for tech in techniques:
+        if tech.get("subtechnique-of"):
+            continue   # subtechniques are handled in the inner loop below
+
         tid = tech["id"]
-        scores = score_technique(tech)
+        tactics = tech.get("tactics", [])
+        scores = score_technique(tech, tactics=tactics)
         lookup[tid] = {
             "id":          tid,
             "name":        tech["name"],
             "type":        "technique",
-            "tactics":     tech.get("tactics", []),
-            "maturity":    tech.get("maturity", "emerging"),
-            "attack_layer": tech.get("attack_layer", "mixed"),
+            "tactics":     tactics,
+            "maturity":    tech.get("maturity", "feasible"),
+            "attack_layer": infer_layer(tactics),
             "scores":      scores,
             "citation":    f"MITRE ATLAS {tid} — {tech['name']}",
         }
-        # Also add subtechniques as aliases
+        # Also add subtechniques, inheriting parent tactics when absent
         for sub in [t for t in techniques if t.get("subtechnique-of") == tid]:
             sub_id = sub["id"]
-            sub_scores = score_technique(sub)
+            effective_tactics = (
+                sub.get("tactics")
+                or parent_tactics.get(tid, [])
+            )
+            sub_scores = score_technique(sub, tactics=effective_tactics)
             lookup[sub_id] = {
-                "id":     sub_id,
-                "name":   sub["name"],
-                "type":   "subtechnique",
-                "parent": tid,
-                "tactics": sub.get("tactics", tech.get("tactics", [])),
-                "maturity": sub.get("maturity", tech.get("maturity", "emerging")),
-                "attack_layer": sub.get("attack_layer", tech.get("attack_layer", "mixed")),
-                "scores":  sub_scores,
-                "citation": f"MITRE ATLAS {sub_id} — {sub['name']} (sub of {tid})",
+                "id":          sub_id,
+                "name":        sub["name"],
+                "type":        "subtechnique",
+                "parent":      tid,
+                "tactics":     effective_tactics,
+                "maturity":    sub.get("maturity", tech.get("maturity", "feasible")),
+                "attack_layer": infer_layer(effective_tactics),
+                "scores":      sub_scores,
+                "citation":    f"MITRE ATLAS {sub_id} — {sub['name']} (sub of {tid})",
             }
 
     # ── Score case studies ─────────────────────────────────────────────────────

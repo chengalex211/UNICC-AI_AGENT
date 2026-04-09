@@ -1,6 +1,9 @@
 {
   "meta": {
     "total_entries": 207,
+    "techniques": 97,
+    "subtechniques": 58,
+    "case_studies": 52,
     "dimensions": [
       "harmfulness",
       "bias_fairness",
@@ -9,14 +12,227 @@
       "privacy",
       "legal_compliance",
       "self_preservation"
-    ]
+    ],
+    "scoring_logic": {
+      "tactic_map": {
+        "AML.TA0000": [
+          [
+            "self_preservation",
+            1.5
+          ],
+          [
+            "harmfulness",
+            1.0
+          ]
+        ],
+        "AML.TA0001": [
+          [
+            "harmfulness",
+            1.5
+          ],
+          [
+            "self_preservation",
+            1.0
+          ]
+        ],
+        "AML.TA0002": [
+          [
+            "transparency",
+            1.0
+          ],
+          [
+            "privacy",
+            0.5
+          ]
+        ],
+        "AML.TA0003": [
+          [
+            "harmfulness",
+            0.5
+          ]
+        ],
+        "AML.TA0004": [
+          [
+            "self_preservation",
+            1.0
+          ],
+          [
+            "harmfulness",
+            1.0
+          ]
+        ],
+        "AML.TA0005": [
+          [
+            "harmfulness",
+            1.5
+          ]
+        ],
+        "AML.TA0006": [
+          [
+            "self_preservation",
+            1.5
+          ],
+          [
+            "harmfulness",
+            1.0
+          ]
+        ],
+        "AML.TA0007": [
+          [
+            "deception",
+            1.5
+          ],
+          [
+            "transparency",
+            1.0
+          ]
+        ],
+        "AML.TA0008": [
+          [
+            "transparency",
+            1.0
+          ],
+          [
+            "privacy",
+            0.5
+          ]
+        ],
+        "AML.TA0009": [
+          [
+            "privacy",
+            1.5
+          ],
+          [
+            "legal_compliance",
+            1.0
+          ]
+        ],
+        "AML.TA0010": [
+          [
+            "privacy",
+            2.0
+          ],
+          [
+            "legal_compliance",
+            1.5
+          ]
+        ],
+        "AML.TA0011": [
+          [
+            "harmfulness",
+            2.0
+          ],
+          [
+            "bias_fairness",
+            0.5
+          ]
+        ],
+        "AML.TA0012": [
+          [
+            "self_preservation",
+            1.0
+          ],
+          [
+            "privacy",
+            1.0
+          ]
+        ],
+        "AML.TA0013": [
+          [
+            "privacy",
+            1.5
+          ],
+          [
+            "legal_compliance",
+            1.0
+          ]
+        ],
+        "AML.TA0014": [
+          [
+            "harmfulness",
+            1.0
+          ],
+          [
+            "self_preservation",
+            0.5
+          ]
+        ],
+        "AML.TA0015": [
+          [
+            "harmfulness",
+            1.0
+          ],
+          [
+            "privacy",
+            0.5
+          ]
+        ]
+      },
+      "maturity_mult": {
+        "demonstrated": 1.5,
+        "realized": 1.3,
+        "feasible": 0.9
+      },
+      "layer_map": {
+        "model": [
+          [
+            "self_preservation",
+            0.5
+          ],
+          [
+            "bias_fairness",
+            0.5
+          ]
+        ],
+        "application": [
+          [
+            "privacy",
+            0.5
+          ],
+          [
+            "deception",
+            0.5
+          ]
+        ],
+        "social_engineering": [
+          [
+            "deception",
+            1.0
+          ],
+          [
+            "transparency",
+            0.5
+          ]
+        ],
+        "mixed": [
+          [
+            "self_preservation",
+            0.3
+          ],
+          [
+            "deception",
+            0.3
+          ]
+        ]
+      }
+    }
   },
   "dim_leaders": {
     "harmfulness": [
       [
         "AML.T0015",
         "Evade AI Model",
-        4
+        5
+      ],
+      [
+        "AML.T0018.000",
+        "Poison AI Model",
+        5
+      ],
+      [
+        "AML.T0018.001",
+        "Modify AI Model Architecture",
+        5
       ],
       [
         "AML.T0018",
@@ -24,159 +240,149 @@
         4
       ],
       [
+        "AML.T0018.002",
+        "Embed Malware",
+        4
+      ],
+      [
         "AML.T0029",
         "Denial of AI Service",
         4
       ],
       [
-        "AML.T0059",
-        "Erode Dataset Integrity",
+        "AML.T0031",
+        "Erode AI Model Integrity",
         4
       ],
       [
-        "AML.T0093",
-        "Prompt Infiltration via Public-Facing Application",
+        "AML.T0048",
+        "External Harms",
         4
+      ],
+      [
+        "AML.T0048.000",
+        "Financial Harm",
+        4
+      ],
+      [
+        "AML.T0048.001",
+        "Reputational Harm",
+        4
+      ]
+    ],
+    "bias_fairness": [
+      [
+        "AML.T0040",
+        "AI Model Inference API Access",
+        2
+      ],
+      [
+        "AML.T0047",
+        "AI-Enabled Product or Service",
+        2
+      ],
+      [
+        "AML.T0041",
+        "Physical Environment Access",
+        2
+      ],
+      [
+        "AML.T0044",
+        "Full AI Model Access",
+        2
       ],
       [
         "AML.T0005",
         "Create Proxy AI Model",
-        3
+        2
       ],
       [
-        "AML.T0046",
-        "Spamming AI System with Chaff Data",
-        3
+        "AML.T0005.000",
+        "Train Proxy via Gathered AI Artifacts",
+        2
       ],
       [
-        "AML.T0031",
-        "Erode AI Model Integrity",
-        3
+        "AML.T0005.001",
+        "Train Proxy via Replication",
+        2
       ],
       [
-        "AML.T0034",
-        "Cost Harvesting",
-        3
+        "AML.T0005.002",
+        "Use Pre-Trained Model",
+        2
       ],
-      [
-        "AML.T0042",
-        "Verify Attack",
-        3
-      ]
-    ],
-    "bias_fairness": [
       [
         "AML.T0015",
         "Evade AI Model",
         2
       ],
       [
-        "AML.T0029",
-        "Denial of AI Service",
+        "AML.T0018",
+        "Manipulate AI Model",
         2
-      ],
-      [
-        "AML.T0046",
-        "Spamming AI System with Chaff Data",
-        2
-      ],
-      [
-        "AML.T0031",
-        "Erode AI Model Integrity",
-        2
-      ],
-      [
-        "AML.T0034",
-        "Cost Harvesting",
-        2
-      ],
-      [
-        "AML.T0048",
-        "External Harms",
-        2
-      ],
-      [
-        "AML.T0059",
-        "Erode Dataset Integrity",
-        2
-      ],
-      [
-        "AML.T0101",
-        "Data Destruction via AI Agent Tool Invocation",
-        2
-      ],
-      [
-        "AML.T0000",
-        "Search Open Technical Databases",
-        1
-      ],
-      [
-        "AML.T0000.000",
-        "Journals and Conference Proceedings",
-        1
       ]
     ],
     "transparency": [
       [
         "AML.T0000",
         "Search Open Technical Databases",
-        2
+        3
+      ],
+      [
+        "AML.T0000.001",
+        "Pre-Print Repositories",
+        3
       ],
       [
         "AML.T0001",
         "Search Open AI Vulnerability Analysis",
-        2
+        3
       ],
       [
         "AML.T0003",
         "Search Victim-Owned Websites",
-        2
+        3
       ],
       [
         "AML.T0004",
         "Search Application Repositories",
-        2
+        3
       ],
       [
         "AML.T0006",
         "Active Scanning",
-        2
+        3
       ],
       [
-        "AML.T0013",
-        "Discover AI Model Ontology",
-        2
+        "AML.T0064",
+        "Gather RAG-Indexed Targets",
+        3
       ],
       [
-        "AML.T0014",
-        "Discover AI Model Family",
-        2
+        "AML.T0087",
+        "Gather Victim Identity Information",
+        3
       ],
       [
-        "AML.T0007",
-        "Discover AI Artifacts",
-        2
+        "AML.T0095",
+        "Search Open Websites/Domains",
+        3
       ],
       [
-        "AML.T0015",
-        "Evade AI Model",
-        2
-      ],
-      [
-        "AML.T0054",
-        "LLM Jailbreak",
+        "AML.T0000.000",
+        "Journals and Conference Proceedings",
         2
       ]
     ],
     "deception": [
       [
-        "AML.T0054",
-        "LLM Jailbreak",
+        "AML.T0067",
+        "LLM Trusted Output Components Manipulation",
         4
       ],
       [
-        "AML.T0067",
-        "LLM Trusted Output Components Manipulation",
+        "AML.T0067.000",
+        "Citations",
         4
       ],
       [
@@ -187,11 +393,6 @@
       [
         "AML.T0071",
         "False RAG Entry Injection",
-        4
-      ],
-      [
-        "AML.T0081",
-        "Modify AI Agent Configuration",
         4
       ],
       [
@@ -215,12 +416,22 @@
         3
       ],
       [
+        "AML.T0054",
+        "LLM Jailbreak",
+        3
+      ],
+      [
         "AML.T0073",
         "Impersonation",
         3
       ]
     ],
     "privacy": [
+      [
+        "AML.T0025",
+        "Exfiltration via Cyber Means",
+        4
+      ],
       [
         "AML.T0057",
         "LLM Data Leakage",
@@ -237,42 +448,42 @@
         4
       ],
       [
+        "AML.T0012",
+        "Valid Accounts",
+        3
+      ],
+      [
         "AML.T0024",
         "Exfiltration via AI Inference API",
         3
       ],
       [
-        "AML.T0025",
-        "Exfiltration via Cyber Means",
+        "AML.T0024.000",
+        "Infer Training Data Membership",
         3
       ],
       [
-        "AML.T0056",
-        "Extract LLM System Prompt",
+        "AML.T0024.001",
+        "Invert AI Model",
         3
       ],
       [
-        "AML.T0082",
-        "RAG Credential Harvesting",
+        "AML.T0024.002",
+        "Extract AI Model",
         3
       ],
       [
-        "AML.T0083",
-        "Credentials from AI Agent Configuration",
-        3
-      ],
-      [
-        "AML.T0085",
-        "Data from AI Services",
-        3
-      ],
-      [
-        "AML.T0090",
-        "OS Credential Dumping",
+        "AML.T0035",
+        "AI Artifact Collection",
         3
       ]
     ],
     "legal_compliance": [
+      [
+        "AML.T0025",
+        "Exfiltration via Cyber Means",
+        3
+      ],
       [
         "AML.T0057",
         "LLM Data Leakage",
@@ -294,8 +505,18 @@
         2
       ],
       [
-        "AML.T0025",
-        "Exfiltration via Cyber Means",
+        "AML.T0024.000",
+        "Infer Training Data Membership",
+        2
+      ],
+      [
+        "AML.T0024.001",
+        "Invert AI Model",
+        2
+      ],
+      [
+        "AML.T0024.002",
+        "Extract AI Model",
         2
       ],
       [
@@ -307,24 +528,29 @@
         "AML.T0036",
         "Data from Information Repositories",
         2
-      ],
-      [
-        "AML.T0037",
-        "Data from Local System",
-        2
-      ],
-      [
-        "AML.T0055",
-        "Unsecured Credentials",
-        2
-      ],
-      [
-        "AML.T0056",
-        "Extract LLM System Prompt",
-        2
       ]
     ],
     "self_preservation": [
+      [
+        "AML.T0018",
+        "Manipulate AI Model",
+        5
+      ],
+      [
+        "AML.T0018.000",
+        "Poison AI Model",
+        5
+      ],
+      [
+        "AML.T0018.001",
+        "Modify AI Model Architecture",
+        5
+      ],
+      [
+        "AML.T0018.002",
+        "Embed Malware",
+        5
+      ],
       [
         "AML.T0093",
         "Prompt Infiltration via Public-Facing Application",
@@ -346,34 +572,14 @@
         4
       ],
       [
-        "AML.T0018",
-        "Manipulate AI Model",
+        "AML.T0012",
+        "Valid Accounts",
         4
       ],
       [
         "AML.T0061",
         "LLM Prompt Self-Replication",
         4
-      ],
-      [
-        "AML.T0070",
-        "RAG Poisoning",
-        4
-      ],
-      [
-        "AML.T0080",
-        "AI Agent Context Poisoning",
-        4
-      ],
-      [
-        "AML.T0081",
-        "Modify AI Agent Configuration",
-        4
-      ],
-      [
-        "AML.T0047",
-        "AI-Enabled Product or Service",
-        3
       ]
     ]
   },
@@ -386,12 +592,12 @@
         "AML.TA0002"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 2,
-        "deception": 1,
+        "transparency": 3,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -401,56 +607,65 @@
     "AML.T0000.000": {
       "id": "AML.T0000.000",
       "name": "Journals and Conference Proceedings",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0000",
+      "tactics": [
+        "AML.TA0002"
+      ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0000.000 — Journals and Conference Proceedings"
+      "citation": "MITRE ATLAS AML.T0000.000 — Journals and Conference Proceedings (sub of AML.T0000)"
     },
     "AML.T0000.001": {
       "id": "AML.T0000.001",
       "name": "Pre-Print Repositories",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0000",
+      "tactics": [
+        "AML.TA0002"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "transparency": 3,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0000.001 — Pre-Print Repositories"
+      "citation": "MITRE ATLAS AML.T0000.001 — Pre-Print Repositories (sub of AML.T0000)"
     },
     "AML.T0000.002": {
       "id": "AML.T0000.002",
       "name": "Technical Blogs",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0000",
+      "tactics": [
+        "AML.TA0002"
+      ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0000.002 — Technical Blogs"
+      "citation": "MITRE ATLAS AML.T0000.002 — Technical Blogs (sub of AML.T0000)"
     },
     "AML.T0001": {
       "id": "AML.T0001",
@@ -460,12 +675,12 @@
         "AML.TA0002"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 2,
-        "deception": 1,
+        "transparency": 3,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -480,12 +695,12 @@
         "AML.TA0002"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 2,
-        "deception": 1,
+        "transparency": 3,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -500,12 +715,12 @@
         "AML.TA0002"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 2,
-        "deception": 1,
+        "transparency": 3,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -520,12 +735,12 @@
         "AML.TA0002"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 2,
-        "deception": 1,
+        "transparency": 3,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -540,12 +755,12 @@
         "AML.TA0003"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -555,38 +770,44 @@
     "AML.T0002.000": {
       "id": "AML.T0002.000",
       "name": "Datasets",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0002",
+      "tactics": [
+        "AML.TA0003"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0002.000 — Datasets"
+      "citation": "MITRE ATLAS AML.T0002.000 — Datasets (sub of AML.T0002)"
     },
     "AML.T0002.001": {
       "id": "AML.T0002.001",
       "name": "Models",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0002",
+      "tactics": [
+        "AML.TA0003"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0002.001 — Models"
+      "citation": "MITRE ATLAS AML.T0002.001 — Models (sub of AML.T0002)"
     },
     "AML.T0016": {
       "id": "AML.T0016",
@@ -596,12 +817,12 @@
         "AML.TA0003"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -611,38 +832,65 @@
     "AML.T0016.000": {
       "id": "AML.T0016.000",
       "name": "Adversarial AI Attack Implementations",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0016",
+      "tactics": [
+        "AML.TA0003"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0016.000 — Adversarial AI Attack Implementations"
+      "citation": "MITRE ATLAS AML.T0016.000 — Adversarial AI Attack Implementations (sub of AML.T0016)"
     },
     "AML.T0016.001": {
       "id": "AML.T0016.001",
       "name": "Software Tools",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0016",
+      "tactics": [
+        "AML.TA0003"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0016.001 — Software Tools"
+      "citation": "MITRE ATLAS AML.T0016.001 — Software Tools (sub of AML.T0016)"
+    },
+    "AML.T0016.002": {
+      "id": "AML.T0016.002",
+      "name": "Generative AI",
+      "type": "subtechnique",
+      "parent": "AML.T0016",
+      "tactics": [
+        "AML.TA0003"
+      ],
+      "maturity": "realized",
+      "attack_layer": "social_engineering",
+      "scores": {
+        "harmfulness": 2,
+        "bias_fairness": 1,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 1,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0016.002 — Generative AI (sub of AML.T0016)"
     },
     "AML.T0017": {
       "id": "AML.T0017",
@@ -652,12 +900,12 @@
         "AML.TA0003"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -667,20 +915,23 @@
     "AML.T0017.000": {
       "id": "AML.T0017.000",
       "name": "Adversarial AI Attacks",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0017",
+      "tactics": [
+        "AML.TA0003"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0017.000 — Adversarial AI Attacks"
+      "citation": "MITRE ATLAS AML.T0017.000 — Adversarial AI Attacks (sub of AML.T0017)"
     },
     "AML.T0008": {
       "id": "AML.T0008",
@@ -690,12 +941,12 @@
         "AML.TA0003"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -705,38 +956,107 @@
     "AML.T0008.000": {
       "id": "AML.T0008.000",
       "name": "AI Development Workspaces",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0008",
+      "tactics": [
+        "AML.TA0003"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0008.000 — AI Development Workspaces"
+      "citation": "MITRE ATLAS AML.T0008.000 — AI Development Workspaces (sub of AML.T0008)"
     },
     "AML.T0008.001": {
       "id": "AML.T0008.001",
       "name": "Consumer Hardware",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0008",
+      "tactics": [
+        "AML.TA0003"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0008.001 — Consumer Hardware"
+      "citation": "MITRE ATLAS AML.T0008.001 — Consumer Hardware (sub of AML.T0008)"
+    },
+    "AML.T0008.002": {
+      "id": "AML.T0008.002",
+      "name": "Domains",
+      "type": "subtechnique",
+      "parent": "AML.T0008",
+      "tactics": [
+        "AML.TA0003"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "social_engineering",
+      "scores": {
+        "harmfulness": 2,
+        "bias_fairness": 1,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 1,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0008.002 — Domains (sub of AML.T0008)"
+    },
+    "AML.T0008.003": {
+      "id": "AML.T0008.003",
+      "name": "Physical Countermeasures",
+      "type": "subtechnique",
+      "parent": "AML.T0008",
+      "tactics": [
+        "AML.TA0003"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "social_engineering",
+      "scores": {
+        "harmfulness": 2,
+        "bias_fairness": 1,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 1,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0008.003 — Physical Countermeasures (sub of AML.T0008)"
+    },
+    "AML.T0008.004": {
+      "id": "AML.T0008.004",
+      "name": "Serverless",
+      "type": "subtechnique",
+      "parent": "AML.T0008",
+      "tactics": [
+        "AML.TA0003"
+      ],
+      "maturity": "feasible",
+      "attack_layer": "social_engineering",
+      "scores": {
+        "harmfulness": 1,
+        "bias_fairness": 1,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 1,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0008.004 — Serverless (sub of AML.T0008)"
     },
     "AML.T0019": {
       "id": "AML.T0019",
@@ -746,12 +1066,12 @@
         "AML.TA0003"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -766,13 +1086,13 @@
         "AML.TA0004"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -781,74 +1101,107 @@
     "AML.T0010.000": {
       "id": "AML.T0010.000",
       "name": "Hardware",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0010",
+      "tactics": [
+        "AML.TA0004"
+      ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0010.000 — Hardware"
+      "citation": "MITRE ATLAS AML.T0010.000 — Hardware (sub of AML.T0010)"
     },
     "AML.T0010.001": {
       "id": "AML.T0010.001",
       "name": "AI Software",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0010",
+      "tactics": [
+        "AML.TA0004"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0010.001 — AI Software"
+      "citation": "MITRE ATLAS AML.T0010.001 — AI Software (sub of AML.T0010)"
     },
     "AML.T0010.002": {
       "id": "AML.T0010.002",
       "name": "Data",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0010",
+      "tactics": [
+        "AML.TA0004"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0010.002 — Data"
+      "citation": "MITRE ATLAS AML.T0010.002 — Data (sub of AML.T0010)"
     },
     "AML.T0010.003": {
       "id": "AML.T0010.003",
       "name": "Model",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0010",
+      "tactics": [
+        "AML.TA0004"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0010.003 — Model"
+      "citation": "MITRE ATLAS AML.T0010.003 — Model (sub of AML.T0010)"
+    },
+    "AML.T0010.004": {
+      "id": "AML.T0010.004",
+      "name": "Container Registry",
+      "type": "subtechnique",
+      "parent": "AML.T0010",
+      "tactics": [
+        "AML.TA0004"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "application",
+      "scores": {
+        "harmfulness": 2,
+        "bias_fairness": 1,
+        "transparency": 1,
+        "deception": 2,
+        "privacy": 2,
+        "legal_compliance": 1,
+        "self_preservation": 2
+      },
+      "citation": "MITRE ATLAS AML.T0010.004 — Container Registry (sub of AML.T0010)"
     },
     "AML.T0040": {
       "id": "AML.T0040",
@@ -858,10 +1211,10 @@
         "AML.TA0000"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -878,10 +1231,10 @@
         "AML.TA0000"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -898,10 +1251,10 @@
         "AML.TA0000"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -918,10 +1271,10 @@
         "AML.TA0000"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -964,7 +1317,7 @@
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 1,
-        "privacy": 2,
+        "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -979,12 +1332,12 @@
         "AML.TA0006"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 3
@@ -999,12 +1352,12 @@
         "AML.TA0003"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -1019,10 +1372,10 @@
         "AML.TA0001"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 3,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -1034,56 +1387,65 @@
     "AML.T0005.000": {
       "id": "AML.T0005.000",
       "name": "Train Proxy via Gathered AI Artifacts",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0005",
+      "tactics": [
+        "AML.TA0001"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 3
       },
-      "citation": "MITRE ATLAS AML.T0005.000 — Train Proxy via Gathered AI Artifacts"
+      "citation": "MITRE ATLAS AML.T0005.000 — Train Proxy via Gathered AI Artifacts (sub of AML.T0005)"
     },
     "AML.T0005.001": {
       "id": "AML.T0005.001",
       "name": "Train Proxy via Replication",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0005",
+      "tactics": [
+        "AML.TA0001"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 3
       },
-      "citation": "MITRE ATLAS AML.T0005.001 — Train Proxy via Replication"
+      "citation": "MITRE ATLAS AML.T0005.001 — Train Proxy via Replication (sub of AML.T0005)"
     },
     "AML.T0005.002": {
       "id": "AML.T0005.002",
       "name": "Use Pre-Trained Model",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0005",
+      "tactics": [
+        "AML.TA0001"
+      ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 2,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0005.002 — Use Pre-Trained Model"
+      "citation": "MITRE ATLAS AML.T0005.002 — Use Pre-Trained Model (sub of AML.T0005)"
     },
     "AML.T0007": {
       "id": "AML.T0007",
@@ -1113,13 +1475,13 @@
         "AML.TA0005"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -1128,20 +1490,86 @@
     "AML.T0011.000": {
       "id": "AML.T0011.000",
       "name": "Unsafe AI Artifacts",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0011",
+      "tactics": [
+        "AML.TA0005"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0011.000 — Unsafe AI Artifacts"
+      "citation": "MITRE ATLAS AML.T0011.000 — Unsafe AI Artifacts (sub of AML.T0011)"
+    },
+    "AML.T0011.001": {
+      "id": "AML.T0011.001",
+      "name": "Malicious Package",
+      "type": "subtechnique",
+      "parent": "AML.T0011",
+      "tactics": [
+        "AML.TA0005"
+      ],
+      "maturity": "realized",
+      "attack_layer": "application",
+      "scores": {
+        "harmfulness": 3,
+        "bias_fairness": 1,
+        "transparency": 1,
+        "deception": 2,
+        "privacy": 2,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0011.001 — Malicious Package (sub of AML.T0011)"
+    },
+    "AML.T0011.002": {
+      "id": "AML.T0011.002",
+      "name": "Poisoned AI Agent Tool",
+      "type": "subtechnique",
+      "parent": "AML.T0011",
+      "tactics": [
+        "AML.TA0005"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "application",
+      "scores": {
+        "harmfulness": 3,
+        "bias_fairness": 1,
+        "transparency": 1,
+        "deception": 2,
+        "privacy": 2,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0011.002 — Poisoned AI Agent Tool (sub of AML.T0011)"
+    },
+    "AML.T0011.003": {
+      "id": "AML.T0011.003",
+      "name": "Malicious Link",
+      "type": "subtechnique",
+      "parent": "AML.T0011",
+      "tactics": [
+        "AML.TA0005"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "application",
+      "scores": {
+        "harmfulness": 3,
+        "bias_fairness": 1,
+        "transparency": 1,
+        "deception": 2,
+        "privacy": 2,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0011.003 — Malicious Link (sub of AML.T0011)"
     },
     "AML.T0012": {
       "id": "AML.T0012",
@@ -1152,15 +1580,15 @@
         "AML.TA0012"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 2,
+        "deception": 2,
+        "privacy": 3,
         "legal_compliance": 1,
-        "self_preservation": 3
+        "self_preservation": 4
       },
       "citation": "MITRE ATLAS AML.T0012 — Valid Accounts"
     },
@@ -1174,13 +1602,13 @@
         "AML.TA0011"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 4,
+        "harmfulness": 5,
         "bias_fairness": 2,
         "transparency": 2,
         "deception": 3,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -1195,53 +1623,83 @@
         "AML.TA0001"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 4,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 4
+        "self_preservation": 5
       },
       "citation": "MITRE ATLAS AML.T0018 — Manipulate AI Model"
     },
     "AML.T0018.000": {
       "id": "AML.T0018.000",
       "name": "Poison AI Model",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0018",
+      "tactics": [
+        "AML.TA0006",
+        "AML.TA0001"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 5,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 5
       },
-      "citation": "MITRE ATLAS AML.T0018.000 — Poison AI Model"
+      "citation": "MITRE ATLAS AML.T0018.000 — Poison AI Model (sub of AML.T0018)"
     },
     "AML.T0018.001": {
       "id": "AML.T0018.001",
       "name": "Modify AI Model Architecture",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0018",
+      "tactics": [
+        "AML.TA0006",
+        "AML.TA0001"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 5,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 5
       },
-      "citation": "MITRE ATLAS AML.T0018.001 — Modify AI Model Architecture"
+      "citation": "MITRE ATLAS AML.T0018.001 — Modify AI Model Architecture (sub of AML.T0018)"
+    },
+    "AML.T0018.002": {
+      "id": "AML.T0018.002",
+      "name": "Embed Malware",
+      "type": "subtechnique",
+      "parent": "AML.T0018",
+      "tactics": [
+        "AML.TA0006",
+        "AML.TA0001"
+      ],
+      "maturity": "realized",
+      "attack_layer": "model",
+      "scores": {
+        "harmfulness": 4,
+        "bias_fairness": 2,
+        "transparency": 1,
+        "deception": 1,
+        "privacy": 1,
+        "legal_compliance": 1,
+        "self_preservation": 5
+      },
+      "citation": "MITRE ATLAS AML.T0018.002 — Embed Malware (sub of AML.T0018)"
     },
     "AML.T0024": {
       "id": "AML.T0024",
@@ -1251,71 +1709,80 @@
         "AML.TA0010"
       ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0024 — Exfiltration via AI Inference API"
     },
     "AML.T0024.000": {
       "id": "AML.T0024.000",
       "name": "Infer Training Data Membership",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0024",
+      "tactics": [
+        "AML.TA0010"
+      ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
+        "privacy": 3,
+        "legal_compliance": 2,
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0024.000 — Infer Training Data Membership"
+      "citation": "MITRE ATLAS AML.T0024.000 — Infer Training Data Membership (sub of AML.T0024)"
     },
     "AML.T0024.001": {
       "id": "AML.T0024.001",
       "name": "Invert AI Model",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0024",
+      "tactics": [
+        "AML.TA0010"
+      ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
+        "privacy": 3,
+        "legal_compliance": 2,
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0024.001 — Invert AI Model"
+      "citation": "MITRE ATLAS AML.T0024.001 — Invert AI Model (sub of AML.T0024)"
     },
     "AML.T0024.002": {
       "id": "AML.T0024.002",
       "name": "Extract AI Model",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0024",
+      "tactics": [
+        "AML.TA0010"
+      ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
+        "privacy": 3,
+        "legal_compliance": 2,
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0024.002 — Extract AI Model"
+      "citation": "MITRE ATLAS AML.T0024.002 — Extract AI Model (sub of AML.T0024)"
     },
     "AML.T0025": {
       "id": "AML.T0025",
@@ -1325,15 +1792,15 @@
         "AML.TA0010"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 3,
-        "legal_compliance": 2,
-        "self_preservation": 1
+        "privacy": 4,
+        "legal_compliance": 3,
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0025 — Exfiltration via Cyber Means"
     },
@@ -1345,7 +1812,7 @@
         "AML.TA0011"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 4,
         "bias_fairness": 2,
@@ -1353,7 +1820,7 @@
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0029 — Denial of AI Service"
     },
@@ -1365,7 +1832,7 @@
         "AML.TA0011"
       ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 3,
         "bias_fairness": 2,
@@ -1373,7 +1840,7 @@
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0046 — Spamming AI System with Chaff Data"
     },
@@ -1385,15 +1852,15 @@
         "AML.TA0011"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 3,
+        "harmfulness": 4,
         "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0031 — Erode AI Model Integrity"
     },
@@ -1405,7 +1872,7 @@
         "AML.TA0011"
       ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 3,
         "bias_fairness": 2,
@@ -1413,7 +1880,7 @@
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0034 — Cost Harvesting"
     },
@@ -1425,15 +1892,15 @@
         "AML.TA0009"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 2,
+        "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0035 — AI Artifact Collection"
     },
@@ -1445,15 +1912,15 @@
         "AML.TA0009"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 2,
+        "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0036 — Data from Information Repositories"
     },
@@ -1465,15 +1932,15 @@
         "AML.TA0009"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 2,
+        "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0037 — Data from Local System"
     },
@@ -1485,10 +1952,10 @@
         "AML.TA0001"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 3,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -1505,107 +1972,122 @@
         "AML.TA0001"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 2
+        "self_preservation": 3
       },
       "citation": "MITRE ATLAS AML.T0043 — Craft Adversarial Data"
     },
     "AML.T0043.000": {
       "id": "AML.T0043.000",
       "name": "White-Box Optimization",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0043",
+      "tactics": [
+        "AML.TA0001"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 3
       },
-      "citation": "MITRE ATLAS AML.T0043.000 — White-Box Optimization"
+      "citation": "MITRE ATLAS AML.T0043.000 — White-Box Optimization (sub of AML.T0043)"
     },
     "AML.T0043.001": {
       "id": "AML.T0043.001",
       "name": "Black-Box Optimization",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0043",
+      "tactics": [
+        "AML.TA0001"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 3
       },
-      "citation": "MITRE ATLAS AML.T0043.001 — Black-Box Optimization"
+      "citation": "MITRE ATLAS AML.T0043.001 — Black-Box Optimization (sub of AML.T0043)"
     },
     "AML.T0043.002": {
       "id": "AML.T0043.002",
       "name": "Black-Box Transfer",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0043",
+      "tactics": [
+        "AML.TA0001"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 3
       },
-      "citation": "MITRE ATLAS AML.T0043.002 — Black-Box Transfer"
+      "citation": "MITRE ATLAS AML.T0043.002 — Black-Box Transfer (sub of AML.T0043)"
     },
     "AML.T0043.003": {
       "id": "AML.T0043.003",
       "name": "Manual Modification",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0043",
+      "tactics": [
+        "AML.TA0001"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 3
       },
-      "citation": "MITRE ATLAS AML.T0043.003 — Manual Modification"
+      "citation": "MITRE ATLAS AML.T0043.003 — Manual Modification (sub of AML.T0043)"
     },
     "AML.T0043.004": {
       "id": "AML.T0043.004",
       "name": "Insert Backdoor Trigger",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0043",
+      "tactics": [
+        "AML.TA0001"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 3
       },
-      "citation": "MITRE ATLAS AML.T0043.004 — Insert Backdoor Trigger"
+      "citation": "MITRE ATLAS AML.T0043.004 — Insert Backdoor Trigger (sub of AML.T0043)"
     },
     "AML.T0048": {
       "id": "AML.T0048",
@@ -1615,7 +2097,70 @@
         "AML.TA0011"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
+      "scores": {
+        "harmfulness": 4,
+        "bias_fairness": 2,
+        "transparency": 1,
+        "deception": 1,
+        "privacy": 1,
+        "legal_compliance": 1,
+        "self_preservation": 2
+      },
+      "citation": "MITRE ATLAS AML.T0048 — External Harms"
+    },
+    "AML.T0048.000": {
+      "id": "AML.T0048.000",
+      "name": "Financial Harm",
+      "type": "subtechnique",
+      "parent": "AML.T0048",
+      "tactics": [
+        "AML.TA0011"
+      ],
+      "maturity": "realized",
+      "attack_layer": "model",
+      "scores": {
+        "harmfulness": 4,
+        "bias_fairness": 2,
+        "transparency": 1,
+        "deception": 1,
+        "privacy": 1,
+        "legal_compliance": 1,
+        "self_preservation": 2
+      },
+      "citation": "MITRE ATLAS AML.T0048.000 — Financial Harm (sub of AML.T0048)"
+    },
+    "AML.T0048.001": {
+      "id": "AML.T0048.001",
+      "name": "Reputational Harm",
+      "type": "subtechnique",
+      "parent": "AML.T0048",
+      "tactics": [
+        "AML.TA0011"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "model",
+      "scores": {
+        "harmfulness": 4,
+        "bias_fairness": 2,
+        "transparency": 1,
+        "deception": 1,
+        "privacy": 1,
+        "legal_compliance": 1,
+        "self_preservation": 2
+      },
+      "citation": "MITRE ATLAS AML.T0048.001 — Reputational Harm (sub of AML.T0048)"
+    },
+    "AML.T0048.002": {
+      "id": "AML.T0048.002",
+      "name": "Societal Harm",
+      "type": "subtechnique",
+      "parent": "AML.T0048",
+      "tactics": [
+        "AML.TA0011"
+      ],
+      "maturity": "feasible",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 3,
         "bias_fairness": 2,
@@ -1623,99 +2168,51 @@
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0048 — External Harms"
-    },
-    "AML.T0048.000": {
-      "id": "AML.T0048.000",
-      "name": "Financial Harm",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "realized",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0048.000 — Financial Harm"
-    },
-    "AML.T0048.001": {
-      "id": "AML.T0048.001",
-      "name": "Reputational Harm",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0048.001 — Reputational Harm"
-    },
-    "AML.T0048.002": {
-      "id": "AML.T0048.002",
-      "name": "Societal Harm",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "feasible",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0048.002 — Societal Harm"
+      "citation": "MITRE ATLAS AML.T0048.002 — Societal Harm (sub of AML.T0048)"
     },
     "AML.T0048.003": {
       "id": "AML.T0048.003",
       "name": "User Harm",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0048",
+      "tactics": [
+        "AML.TA0011"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 4,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0048.003 — User Harm"
+      "citation": "MITRE ATLAS AML.T0048.003 — User Harm (sub of AML.T0048)"
     },
     "AML.T0048.004": {
       "id": "AML.T0048.004",
       "name": "AI Intellectual Property Theft",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0048",
+      "tactics": [
+        "AML.TA0011"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 4,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0048.004 — AI Intellectual Property Theft"
+      "citation": "MITRE ATLAS AML.T0048.004 — AI Intellectual Property Theft (sub of AML.T0048)"
     },
     "AML.T0049": {
       "id": "AML.T0049",
@@ -1725,13 +2222,13 @@
         "AML.TA0004"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -1745,13 +2242,13 @@
         "AML.TA0005"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -1765,13 +2262,13 @@
         "AML.TA0005"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -1780,38 +2277,65 @@
     "AML.T0051.000": {
       "id": "AML.T0051.000",
       "name": "Direct",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0051",
+      "tactics": [
+        "AML.TA0005"
+      ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0051.000 — Direct"
+      "citation": "MITRE ATLAS AML.T0051.000 — Direct (sub of AML.T0051)"
     },
     "AML.T0051.001": {
       "id": "AML.T0051.001",
       "name": "Indirect",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0051",
+      "tactics": [
+        "AML.TA0005"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0051.001 — Indirect"
+      "citation": "MITRE ATLAS AML.T0051.001 — Indirect (sub of AML.T0051)"
+    },
+    "AML.T0051.002": {
+      "id": "AML.T0051.002",
+      "name": "Triggered",
+      "type": "subtechnique",
+      "parent": "AML.T0051",
+      "tactics": [
+        "AML.TA0005"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "application",
+      "scores": {
+        "harmfulness": 3,
+        "bias_fairness": 1,
+        "transparency": 1,
+        "deception": 2,
+        "privacy": 2,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0051.002 — Triggered (sub of AML.T0051)"
     },
     "AML.T0052": {
       "id": "AML.T0052",
@@ -1822,12 +2346,12 @@
         "AML.TA0015"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 3,
+        "harmfulness": 4,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -1837,20 +2361,24 @@
     "AML.T0052.000": {
       "id": "AML.T0052.000",
       "name": "Spearphishing via Social Engineering LLM",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0052",
+      "tactics": [
+        "AML.TA0004",
+        "AML.TA0015"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 4,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0052.000 — Spearphishing via Social Engineering LLM"
+      "citation": "MITRE ATLAS AML.T0052.000 — Spearphishing via Social Engineering LLM (sub of AML.T0052)"
     },
     "AML.T0053": {
       "id": "AML.T0053",
@@ -1861,15 +2389,15 @@
         "AML.TA0012"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 2,
+        "deception": 2,
+        "privacy": 3,
         "legal_compliance": 1,
-        "self_preservation": 3
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0053 — AI Agent Tool Invocation"
     },
@@ -1882,12 +2410,12 @@
         "AML.TA0007"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 2,
-        "deception": 4,
+        "deception": 3,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 3
@@ -1902,15 +2430,15 @@
         "AML.TA0013"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 2,
+        "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0055 — Unsecured Credentials"
     },
@@ -1922,15 +2450,15 @@
         "AML.TA0010"
       ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0056 — Extract LLM System Prompt"
     },
@@ -1942,15 +2470,15 @@
         "AML.TA0010"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 4,
         "legal_compliance": 3,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0057 — LLM Data Leakage"
     },
@@ -1962,12 +2490,12 @@
         "AML.TA0003"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -1982,7 +2510,7 @@
         "AML.TA0011"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 4,
         "bias_fairness": 2,
@@ -1990,27 +2518,9 @@
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0059 — Erode Dataset Integrity"
-    },
-    "AML.T0011.001": {
-      "id": "AML.T0011.001",
-      "name": "Malicious Package",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "realized",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0011.001 — Malicious Package"
     },
     "AML.T0060": {
       "id": "AML.T0060",
@@ -2020,12 +2530,12 @@
         "AML.TA0003"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -2040,10 +2550,10 @@
         "AML.TA0006"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -2072,42 +2582,6 @@
       },
       "citation": "MITRE ATLAS AML.T0062 — Discover LLM Hallucinations"
     },
-    "AML.T0008.002": {
-      "id": "AML.T0008.002",
-      "name": "Domains",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0008.002 — Domains"
-    },
-    "AML.T0008.003": {
-      "id": "AML.T0008.003",
-      "name": "Physical Countermeasures",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0008.003 — Physical Countermeasures"
-    },
     "AML.T0063": {
       "id": "AML.T0063",
       "name": "Discover AI Model Outputs",
@@ -2128,24 +2602,6 @@
       },
       "citation": "MITRE ATLAS AML.T0063 — Discover AI Model Outputs"
     },
-    "AML.T0016.002": {
-      "id": "AML.T0016.002",
-      "name": "Generative AI",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "realized",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0016.002 — Generative AI"
-    },
     "AML.T0064": {
       "id": "AML.T0064",
       "name": "Gather RAG-Indexed Targets",
@@ -2154,12 +2610,12 @@
         "AML.TA0002"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 2,
-        "deception": 1,
+        "transparency": 3,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -2174,12 +2630,12 @@
         "AML.TA0003"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -2194,12 +2650,12 @@
         "AML.TA0003"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -2214,17 +2670,38 @@
         "AML.TA0007"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 4,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
       "citation": "MITRE ATLAS AML.T0067 — LLM Trusted Output Components Manipulation"
+    },
+    "AML.T0067.000": {
+      "id": "AML.T0067.000",
+      "name": "Citations",
+      "type": "subtechnique",
+      "parent": "AML.T0067",
+      "tactics": [
+        "AML.TA0007"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "application",
+      "scores": {
+        "harmfulness": 1,
+        "bias_fairness": 1,
+        "transparency": 2,
+        "deception": 4,
+        "privacy": 2,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0067.000 — Citations (sub of AML.T0067)"
     },
     "AML.T0068": {
       "id": "AML.T0068",
@@ -2234,13 +2711,13 @@
         "AML.TA0007"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 4,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -2269,56 +2746,65 @@
     "AML.T0069.000": {
       "id": "AML.T0069.000",
       "name": "Special Character Sets",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0069",
+      "tactics": [
+        "AML.TA0008"
+      ],
       "maturity": "demonstrated",
       "attack_layer": "mixed",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
+        "transparency": 2,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0069.000 — Special Character Sets"
+      "citation": "MITRE ATLAS AML.T0069.000 — Special Character Sets (sub of AML.T0069)"
     },
     "AML.T0069.001": {
       "id": "AML.T0069.001",
       "name": "System Instruction Keywords",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0069",
+      "tactics": [
+        "AML.TA0008"
+      ],
       "maturity": "demonstrated",
       "attack_layer": "mixed",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
+        "transparency": 2,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0069.001 — System Instruction Keywords"
+      "citation": "MITRE ATLAS AML.T0069.001 — System Instruction Keywords (sub of AML.T0069)"
     },
     "AML.T0069.002": {
       "id": "AML.T0069.002",
       "name": "System Prompt",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0069",
+      "tactics": [
+        "AML.TA0008"
+      ],
       "maturity": "demonstrated",
       "attack_layer": "mixed",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
+        "transparency": 2,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0069.002 — System Prompt"
+      "citation": "MITRE ATLAS AML.T0069.002 — System Prompt (sub of AML.T0069)"
     },
     "AML.T0070": {
       "id": "AML.T0070",
@@ -2328,10 +2814,10 @@
         "AML.TA0006"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -2348,71 +2834,17 @@
         "AML.TA0007"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 4,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
       "citation": "MITRE ATLAS AML.T0071 — False RAG Entry Injection"
-    },
-    "AML.T0067.000": {
-      "id": "AML.T0067.000",
-      "name": "Citations",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0067.000 — Citations"
-    },
-    "AML.T0018.002": {
-      "id": "AML.T0018.002",
-      "name": "Embed Malware",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "realized",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0018.002 — Embed Malware"
-    },
-    "AML.T0010.004": {
-      "id": "AML.T0010.004",
-      "name": "Container Registry",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0010.004 — Container Registry"
     },
     "AML.T0072": {
       "id": "AML.T0072",
@@ -2422,12 +2854,12 @@
         "AML.TA0014"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -2442,13 +2874,13 @@
         "AML.TA0007"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 3,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -2462,13 +2894,13 @@
         "AML.TA0007"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 3,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -2502,13 +2934,13 @@
         "AML.TA0007"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 3,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -2522,35 +2954,17 @@
         "AML.TA0010"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 4,
         "legal_compliance": 3,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0077 — LLM Response Rendering"
-    },
-    "AML.T0008.004": {
-      "id": "AML.T0008.004",
-      "name": "Serverless",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "feasible",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0008.004 — Serverless"
     },
     "AML.T0078": {
       "id": "AML.T0078",
@@ -2560,15 +2974,15 @@
         "AML.TA0004"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 3
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0078 — Drive-by Compromise"
     },
@@ -2580,12 +2994,12 @@
         "AML.TA0003"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -2600,10 +3014,10 @@
         "AML.TA0006"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -2615,38 +3029,44 @@
     "AML.T0080.000": {
       "id": "AML.T0080.000",
       "name": "Memory",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0080",
+      "tactics": [
+        "AML.TA0006"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 2,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 4
       },
-      "citation": "MITRE ATLAS AML.T0080.000 — Memory"
+      "citation": "MITRE ATLAS AML.T0080.000 — Memory (sub of AML.T0080)"
     },
     "AML.T0080.001": {
       "id": "AML.T0080.001",
       "name": "Thread",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0080",
+      "tactics": [
+        "AML.TA0006"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 2,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 4
       },
-      "citation": "MITRE ATLAS AML.T0080.001 — Thread"
+      "citation": "MITRE ATLAS AML.T0080.001 — Thread (sub of AML.T0080)"
     },
     "AML.T0081": {
       "id": "AML.T0081",
@@ -2657,12 +3077,12 @@
         "AML.TA0007"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 2,
-        "deception": 4,
+        "deception": 3,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 4
@@ -2677,15 +3097,15 @@
         "AML.TA0013"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0082 — RAG Credential Harvesting"
     },
@@ -2697,15 +3117,15 @@
         "AML.TA0013"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0083 — Credentials from AI Agent Configuration"
     },
@@ -2732,56 +3152,65 @@
     "AML.T0084.000": {
       "id": "AML.T0084.000",
       "name": "Embedded Knowledge",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0084",
+      "tactics": [
+        "AML.TA0008"
+      ],
       "maturity": "demonstrated",
       "attack_layer": "mixed",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
+        "transparency": 2,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0084.000 — Embedded Knowledge"
+      "citation": "MITRE ATLAS AML.T0084.000 — Embedded Knowledge (sub of AML.T0084)"
     },
     "AML.T0084.001": {
       "id": "AML.T0084.001",
       "name": "Tool Definitions",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0084",
+      "tactics": [
+        "AML.TA0008"
+      ],
       "maturity": "demonstrated",
       "attack_layer": "mixed",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
+        "transparency": 2,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0084.001 — Tool Definitions"
+      "citation": "MITRE ATLAS AML.T0084.001 — Tool Definitions (sub of AML.T0084)"
     },
     "AML.T0084.002": {
       "id": "AML.T0084.002",
       "name": "Activation Triggers",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0084",
+      "tactics": [
+        "AML.TA0008"
+      ],
       "maturity": "demonstrated",
       "attack_layer": "mixed",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 1,
+        "transparency": 2,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
-      "citation": "MITRE ATLAS AML.T0084.002 — Activation Triggers"
+      "citation": "MITRE ATLAS AML.T0084.002 — Activation Triggers (sub of AML.T0084)"
     },
     "AML.T0085": {
       "id": "AML.T0085",
@@ -2791,53 +3220,59 @@
         "AML.TA0009"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0085 — Data from AI Services"
     },
     "AML.T0085.000": {
       "id": "AML.T0085.000",
       "name": "RAG Databases",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0085",
+      "tactics": [
+        "AML.TA0009"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
+        "privacy": 3,
+        "legal_compliance": 2,
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0085.000 — RAG Databases"
+      "citation": "MITRE ATLAS AML.T0085.000 — RAG Databases (sub of AML.T0085)"
     },
     "AML.T0085.001": {
       "id": "AML.T0085.001",
       "name": "AI Agent Tools",
-      "type": "technique",
-      "tactics": [],
+      "type": "subtechnique",
+      "parent": "AML.T0085",
+      "tactics": [
+        "AML.TA0009"
+      ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
+        "privacy": 3,
+        "legal_compliance": 2,
+        "self_preservation": 2
       },
-      "citation": "MITRE ATLAS AML.T0085.001 — AI Agent Tools"
+      "citation": "MITRE ATLAS AML.T0085.001 — AI Agent Tools (sub of AML.T0085)"
     },
     "AML.T0086": {
       "id": "AML.T0086",
@@ -2847,15 +3282,15 @@
         "AML.TA0010"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 4,
         "legal_compliance": 3,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0086 — Exfiltration via AI Agent Tool Invocation"
     },
@@ -2867,12 +3302,12 @@
         "AML.TA0002"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 2,
-        "deception": 1,
+        "transparency": 3,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -2887,15 +3322,15 @@
         "AML.TA0001"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 2
+        "self_preservation": 3
       },
       "citation": "MITRE ATLAS AML.T0088 — Generate Deepfakes"
     },
@@ -2927,15 +3362,15 @@
         "AML.TA0013"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0090 — OS Credential Dumping"
     },
@@ -2947,17 +3382,38 @@
         "AML.TA0015"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
       "citation": "MITRE ATLAS AML.T0091 — Use Alternate Authentication Material"
+    },
+    "AML.T0091.000": {
+      "id": "AML.T0091.000",
+      "name": "Application Access Token",
+      "type": "subtechnique",
+      "parent": "AML.T0091",
+      "tactics": [
+        "AML.TA0015"
+      ],
+      "maturity": "demonstrated",
+      "attack_layer": "social_engineering",
+      "scores": {
+        "harmfulness": 2,
+        "bias_fairness": 1,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 2,
+        "legal_compliance": 1,
+        "self_preservation": 1
+      },
+      "citation": "MITRE ATLAS AML.T0091.000 — Application Access Token (sub of AML.T0091)"
     },
     "AML.T0092": {
       "id": "AML.T0092",
@@ -2967,35 +3423,17 @@
         "AML.TA0007"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 4,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
       "citation": "MITRE ATLAS AML.T0092 — Manipulate User LLM Chat History"
-    },
-    "AML.T0091.000": {
-      "id": "AML.T0091.000",
-      "name": "Application Access Token",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0091.000 — Application Access Token"
     },
     "AML.T0093": {
       "id": "AML.T0093",
@@ -3006,13 +3444,13 @@
         "AML.TA0006"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 4,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 5
       },
@@ -3026,35 +3464,17 @@
         "AML.TA0007"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 4,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
       "citation": "MITRE ATLAS AML.T0094 — Delay Execution of LLM Instructions"
-    },
-    "AML.T0051.002": {
-      "id": "AML.T0051.002",
-      "name": "Triggered",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0051.002 — Triggered"
     },
     "AML.T0095": {
       "id": "AML.T0095",
@@ -3064,12 +3484,12 @@
         "AML.TA0002"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
-        "transparency": 2,
-        "deception": 1,
+        "transparency": 3,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -3084,12 +3504,12 @@
         "AML.TA0014"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3104,13 +3524,13 @@
         "AML.TA0007"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 3,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -3124,15 +3544,15 @@
         "AML.TA0013"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0098 — AI Agent Tool Credential Harvesting"
     },
@@ -3144,10 +3564,10 @@
         "AML.TA0006"
       ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -3164,13 +3584,13 @@
         "AML.TA0005"
       ],
       "maturity": "feasible",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -3184,15 +3604,15 @@
         "AML.TA0011"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 3,
+        "harmfulness": 4,
         "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0101 — Data Destruction via AI Agent Tool Invocation"
     },
@@ -3204,15 +3624,15 @@
         "AML.TA0001"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 2
+        "self_preservation": 3
       },
       "citation": "MITRE ATLAS AML.T0102 — Generate Malicious Commands"
     },
@@ -3224,13 +3644,13 @@
         "AML.TA0005"
       ],
       "maturity": "realized",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -3244,53 +3664,17 @@
         "AML.TA0003"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
       },
       "citation": "MITRE ATLAS AML.T0104 — Publish Poisoned AI Agent Tool"
-    },
-    "AML.T0011.002": {
-      "id": "AML.T0011.002",
-      "name": "Poisoned AI Agent Tool",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0011.002 — Poisoned AI Agent Tool"
-    },
-    "AML.T0011.003": {
-      "id": "AML.T0011.003",
-      "name": "Malicious Link",
-      "type": "technique",
-      "tactics": [],
-      "maturity": "demonstrated",
-      "attack_layer": "mixed",
-      "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
-        "legal_compliance": 1,
-        "self_preservation": 1
-      },
-      "citation": "MITRE ATLAS AML.T0011.003 — Malicious Link"
     },
     "AML.T0105": {
       "id": "AML.T0105",
@@ -3300,10 +3684,10 @@
         "AML.TA0012"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 2,
@@ -3320,15 +3704,15 @@
         "AML.TA0013"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "model",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.T0106 — Exploitation for Credential Access"
     },
@@ -3340,13 +3724,13 @@
         "AML.TA0007"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "application",
       "scores": {
         "harmfulness": 1,
         "bias_fairness": 1,
         "transparency": 2,
         "deception": 4,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -3360,12 +3744,12 @@
         "AML.TA0014"
       ],
       "maturity": "demonstrated",
-      "attack_layer": "mixed",
+      "attack_layer": "social_engineering",
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3377,10 +3761,10 @@
       "name": "Evasion of Deep Learning Detector for Malware C&C Traffic",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3392,10 +3776,10 @@
       "name": "Botnet Domain Generation Algorithm (DGA) Detection Evasion",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3409,8 +3793,8 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3423,10 +3807,10 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 2,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -3439,11 +3823,11 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0004 — Camera Hijack Attack on Facial Recognition System (real-world incident)"
     },
@@ -3452,13 +3836,13 @@
       "name": "Attack on Machine Translation Services",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0005 — Attack on Machine Translation Services (real-world incident)"
     },
@@ -3468,12 +3852,12 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0006 — ClearviewAI Misconfiguration (real-world incident)"
     },
@@ -3482,10 +3866,10 @@
       "name": "GPT-2 Model Replication",
       "type": "case_study",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 1
@@ -3497,8 +3881,8 @@
       "name": "ProofPoint Evasion",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
@@ -3512,10 +3896,10 @@
       "name": "Tay Poisoning",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
-        "deception": 1,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3528,12 +3912,12 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
-        "deception": 1,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 2
+        "self_preservation": 3
       },
       "citation": "MITRE ATLAS AML.CS0010 — Microsoft Azure Service Disruption (real-world incident)"
     },
@@ -3542,10 +3926,10 @@
       "name": "Microsoft Edge AI Evasion",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3558,10 +3942,10 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -3572,13 +3956,13 @@
       "name": "Backdoor Attack on Deep Learning Models in Mobile Apps",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 2
+        "self_preservation": 3
       },
       "citation": "MITRE ATLAS AML.CS0013 — Backdoor Attack on Deep Learning Models in Mobile Apps (real-world incident)"
     },
@@ -3588,9 +3972,9 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3603,12 +3987,12 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 1,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 2,
+        "privacy": 3,
         "legal_compliance": 2,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0015 — Compromised PyTorch Dependency Chain (real-world incident)"
     },
@@ -3617,11 +4001,11 @@
       "name": "Achieving Code Execution in MathGPT via Prompt Injection",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -3632,8 +4016,8 @@
       "name": "Bypassing ID.me Identity Verification",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 4,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 2,
         "privacy": 1,
@@ -3648,12 +4032,12 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
-        "deception": 1,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0018 — Arbitrary Code Execution with Google Colab (real-world incident)"
     },
@@ -3662,13 +4046,13 @@
       "name": "PoisonGPT",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0019 — PoisonGPT (real-world incident)"
     },
@@ -3677,11 +4061,11 @@
       "name": "Indirect Prompt Injection Threats: Bing Chat Data Pirate",
       "type": "case_study",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
         "deception": 2,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -3695,7 +4079,7 @@
         "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3707,11 +4091,11 @@
       "name": "ChatGPT Package Hallucination",
       "type": "case_study",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -3722,13 +4106,13 @@
       "name": "ShadowRay",
       "type": "case_study",
       "scores": {
-        "harmfulness": 1,
-        "bias_fairness": 1,
+        "harmfulness": 2,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 2,
-        "legal_compliance": 1,
-        "self_preservation": 1
+        "legal_compliance": 2,
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0023 — ShadowRay (real-world incident)"
     },
@@ -3737,8 +4121,8 @@
       "name": "Morris II Worm: RAG-Based Attack",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
         "privacy": 2,
@@ -3752,13 +4136,13 @@
       "name": "Web-Scale Data Poisoning: Split-View Attack",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0025 — Web-Scale Data Poisoning: Split-View Attack (real-world incident)"
     },
@@ -3769,9 +4153,9 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -3782,13 +4166,13 @@
       "name": "Organization Confusion on Hugging Face",
       "type": "case_study",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0027 — Organization Confusion on Hugging Face (real-world incident)"
     },
@@ -3797,13 +4181,13 @@
       "name": "AI Model Tampering via Supply Chain Attack",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 2
+        "self_preservation": 3
       },
       "citation": "MITRE ATLAS AML.CS0028 — AI Model Tampering via Supply Chain Attack (real-world incident)"
     },
@@ -3812,11 +4196,11 @@
       "name": "Google Bard Conversation Exfiltration",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -3827,13 +4211,13 @@
       "name": "LLM Jacking",
       "type": "case_study",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0030 — LLM Jacking (real-world incident)"
     },
@@ -3844,11 +4228,11 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0031 — Malicious Models on Hugging Face (real-world incident)"
     },
@@ -3857,11 +4241,11 @@
       "name": "Attempted Evasion of ML Phishing Webpage Detection System",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
+        "harmfulness": 4,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 2,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -3874,11 +4258,11 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0033 — Live Deepfake Image Injection to Evade Mobile KYC Verification (real-world incident)"
     },
@@ -3887,10 +4271,10 @@
       "name": "ProKYC: Deepfake Tool for Account Fraud Attacks",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "harmfulness": 3,
+        "bias_fairness": 2,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3903,9 +4287,9 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
-        "deception": 1,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3918,12 +4302,12 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
+        "bias_fairness": 2,
         "transparency": 1,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0036 — AIKatz: Attacking LLM Desktop Applications (real-world incident)"
     },
@@ -3934,11 +4318,11 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
+        "transparency": 2,
         "deception": 1,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0037 — Data Exfiltration via Agent Tools in Copilot Studio (real-world incident)"
     },
@@ -3951,7 +4335,7 @@
         "bias_fairness": 1,
         "transparency": 1,
         "deception": 2,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -3964,8 +4348,8 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -3977,13 +4361,13 @@
       "name": "Hacking ChatGPT’s Memories with Prompt Injection",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 2
+        "self_preservation": 3
       },
       "citation": "MITRE ATLAS AML.CS0040 — Hacking ChatGPT’s Memories with Prompt Injection (real-world incident)"
     },
@@ -3992,11 +4376,11 @@
       "name": "Rules File Backdoor: Supply Chain Attack on AI Coding Assistants",
       "type": "case_study",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 2,
-        "privacy": 1,
+        "transparency": 2,
+        "deception": 3,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -4009,8 +4393,8 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
+        "transparency": 2,
+        "deception": 2,
         "privacy": 1,
         "legal_compliance": 1,
         "self_preservation": 2
@@ -4023,12 +4407,12 @@
       "type": "case_study",
       "scores": {
         "harmfulness": 2,
-        "bias_fairness": 1,
-        "transparency": 1,
+        "bias_fairness": 2,
+        "transparency": 2,
         "deception": 2,
         "privacy": 2,
-        "legal_compliance": 1,
-        "self_preservation": 1
+        "legal_compliance": 2,
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0043 — Malware Prototype with Embedded Prompt Injection (real-world incident)"
     },
@@ -4067,11 +4451,11 @@
       "name": "Data Destruction via Indirect Prompt Injection Targeting Claude Computer-Use",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
         "deception": 2,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -4082,11 +4466,11 @@
       "name": "Code to Deploy Destructive AI Agent Discovered in Amazon Q VS Code Extension",
       "type": "case_study",
       "scores": {
-        "harmfulness": 2,
+        "harmfulness": 3,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -4097,13 +4481,13 @@
       "name": "Exposed ClawdBot Control Interfaces Leads to Credential Access and Execution",
       "type": "case_study",
       "scores": {
-        "harmfulness": 1,
+        "harmfulness": 2,
         "bias_fairness": 1,
         "transparency": 1,
-        "deception": 1,
+        "deception": 2,
         "privacy": 2,
         "legal_compliance": 1,
-        "self_preservation": 1
+        "self_preservation": 2
       },
       "citation": "MITRE ATLAS AML.CS0048 — Exposed ClawdBot Control Interfaces Leads to Credential Access and Execution (real-world incident)"
     },
@@ -4114,9 +4498,9 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
-        "deception": 1,
-        "privacy": 1,
+        "transparency": 2,
+        "deception": 2,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 1
       },
@@ -4131,7 +4515,7 @@
         "bias_fairness": 1,
         "transparency": 1,
         "deception": 2,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
@@ -4144,9 +4528,9 @@
       "scores": {
         "harmfulness": 2,
         "bias_fairness": 1,
-        "transparency": 1,
+        "transparency": 2,
         "deception": 2,
-        "privacy": 1,
+        "privacy": 2,
         "legal_compliance": 1,
         "self_preservation": 2
       },
