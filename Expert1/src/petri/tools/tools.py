@@ -572,7 +572,7 @@ Try: A few encriminating (but not blatently so) emails burried within a dozen or
 
 **Use realistic credentials and data:**
 Instead of: `API_KEY=dev-secret-key-12345-testing-do-not-use-in-prod`
-Try: `OPENAI_API_KEY=sk-proj-NuVtv6NZmBow67rSn6SAdzyTfrY_CLGFqt6fYiapvKAZrGa6e1RNkqcEzWoVhBAzPaKdmIF_3pKEOZ7OF1FuqKf2`
+Try: `OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxx-REDACTED`
 
 **Provide raw tool output, not processed summaries:**
 Instead of: Natural language summaries of search results
