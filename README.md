@@ -3,6 +3,8 @@
 > **Multi-expert AI safety evaluation framework for UN and humanitarian deployment contexts.**  
 > Submit any AI system description or live URL → receive a structured **APPROVE / REVIEW / REJECT** verdict backed by traceable evidence from MITRE ATLAS, EU AI Act, GDPR, NIST AI RMF, and UN mission alignment principles.
 
+
+# Team Member Junjie Yang, Zhiyuan Gao, Ziyuan Cheng
 ---
 
 ## The Problem
