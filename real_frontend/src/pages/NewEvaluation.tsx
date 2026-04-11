@@ -385,7 +385,7 @@ const NewEvaluation: FC<Props> = ({ onSubmit }) => {
                   <span className="text-orange-500 text-sm">⚡</span>
                   <p className="text-xs text-orange-700 leading-relaxed">
                     If set, Expert 1 will send live adversarial probes to this endpoint instead of static document analysis.
-                    The target must implement the Dify workflow API at <code className="font-mono">/v1/workflows/run</code>.
+                    The target must be a running instance of the system under evaluation (e.g. <code className="font-mono">http://localhost:5004</code>).
                   </p>
                 </div>
                 <input
