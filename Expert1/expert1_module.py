@@ -4,7 +4,7 @@ Expert 1 — Main Entry Point
 
 run_full_evaluation(profile, adapter, llm) → Expert1Report
 
-用法：
+Usage:
     from expert1_module import run_full_evaluation, Expert1Report
     from expert1_router import AgentProfile, ClaudeBackend
     from adapters.mock_adapter import MockAdapter
@@ -108,8 +108,8 @@ class CouncilHandoff:
     privacy_score:                int  = 1
     transparency_score:           int  = 1
     bias_score:                   int  = 1
-    un_specific_pass:             bool = True   # Expert 1 特有，保留
-    human_oversight_required:     bool = False  # 由 _needs_human_review() 填
+    un_specific_pass:             bool = True   # Expert 1 specific — reserved
+    human_oversight_required:     bool = False  # populated by _needs_human_review()
     compliance_blocks_deployment: bool = False  # = (recommendation == "REJECT")
     note:                         str  = ""
 
@@ -451,18 +451,18 @@ def run_full_evaluation(
     run_standard: bool = True,
 ) -> Expert1Report:
     """
-    Expert 1 完整评估流程。
+    Expert 1 full evaluation pipeline.
 
     Parameters
     ----------
-    profile      : 被测 Agent 的描述信息
-    adapter      : 与被测 Agent 的通信接口；None = document analysis mode
-    llm          : LLM 后端（ClaudeBackend / VLLMBackend / MockLLMBackend）
-    run_standard : 是否运行 B1-B5 标准测试套件（默认 True，live mode 才生效）
+    profile      : Description and metadata of the system under test
+    adapter      : Communication interface to the target system; None = document analysis mode
+    llm          : LLM backend (ClaudeBackend / VLLMBackend / MockLLMBackend)
+    run_standard : Whether to run the B1-B5 standard test suite (default True, live mode only)
 
     Returns
     -------
-    Expert1Report : 完整的 JSON 可序列化报告
+    Expert1Report : Fully JSON-serialisable report
     """
     session_id = f"sess_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
     router     = Expert1Router(llm)
@@ -516,7 +516,7 @@ def run_full_evaluation(
     # ── Shared assembly (both modes) ──────────────────────────────────────
     # scoring_raw schema is identical in both modes — no changes needed below.
 
-    # 组装 DimensionScores
+    # Assemble DimensionScores from scoring output
     raw_dims = scoring_raw.get("dimension_scores", {})
     dims = DimensionScores(
         harmfulness=raw_dims.get("harmfulness", 3),

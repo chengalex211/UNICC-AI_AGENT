@@ -131,10 +131,10 @@ TOOLS = [
             "type": "object",
             "properties": {
 
-                # ── 基本信息 ───────────────────────────────────────────────
+                # ── Basic information ──────────────────────────────────────
                 "system_name": {"type": "string"},
 
-                # ── EU AI Act 风险分类 ────────────────────────────────────
+                # ── EU AI Act risk classification ─────────────────────────
                 "risk_classification": {
                     "type": "object",
                     "description": "EU AI Act risk tier and supplementary flags",
@@ -159,7 +159,7 @@ TOOLS = [
                     "required": ["eu_ai_act_tier", "gpai_applicable", "prohibited"]
                 },
 
-                # ── 9维度合规判定 ─────────────────────────────────────────
+                # ── 9-dimension compliance assessment ────────────────────
                 "compliance_findings": {
                     "type": "object",
                     "description": "Assessment result for each of the 9 compliance dimensions",
@@ -182,13 +182,13 @@ TOOLS = [
                     ]
                 },
 
-                # ── 总体结论 ──────────────────────────────────────────────
+                # ── Overall conclusion ────────────────────────────────────
                 "overall_compliance": {
                     "type": "string",
                     "enum": ["COMPLIANT", "CONDITIONAL", "NON_COMPLIANT"]
                 },
 
-                # ── 具体缺口（带条款引用）─────────────────────────────────
+                # ── Specific gaps (with article references) ───────────────
                 "key_gaps": {
                     "type": "array",
                     "description": "Audit-quality compliance gaps as structured objects.",
@@ -204,7 +204,7 @@ TOOLS = [
                     }
                 },
 
-                # ── 三级建议 ──────────────────────────────────────────────
+                # ── Three-tier recommendations ────────────────────────────
                 "recommendations": {
                     "type": "object",
                     "properties": {
@@ -215,14 +215,14 @@ TOOLS = [
                     "required": ["must", "should", "could"]
                 },
 
-                # ── 使用的法规列表 ────────────────────────────────────────
+                # ── List of regulatory frameworks cited ───────────────────
                 "regulatory_citations": {
                     "type": "array",
                     "description": "All articles cited in this assessment. Format: 'Framework Article X — Title'",
                     "items": {"type": "string"}
                 },
 
-                # ── 叙述性摘要 ────────────────────────────────────────────
+                # ── Narrative summary ─────────────────────────────────────
                 "narrative": {
                     "type": "string",
                     "description": (
@@ -234,7 +234,7 @@ TOOLS = [
                     )
                 },
 
-                # ── Council 交接字段 ──────────────────────────────────────
+                # ── Council handoff fields ────────────────────────────────
                 "council_handoff": {
                     "type": "object",
                     "description": "Scores and flags for Expert 1 and Expert 3 cross-validation",
@@ -279,7 +279,7 @@ TOOLS = [
                     ]
                 },
 
-                # ── 元数据 ────────────────────────────────────────────────
+                # ── Metadata ──────────────────────────────────────────────
                 "confidence": {
                     "type": "number",
                     "description": "Assessment confidence 0.0-1.0. Reduce if based on incomplete documentation."
@@ -609,15 +609,15 @@ def _format_gaps(raw_gaps: list) -> list:
 
 def apply_label_override(assessment: dict, system_class: str) -> dict:
     """
-    A类系统（设计合规）：无 must-level 建议时强制标为 COMPLIANT。
-    同时确保 compliance_blocks_deployment = False。
+    Class-A systems (designed for compliance): force COMPLIANT when there are no must-level recommendations.
+    Also ensures compliance_blocks_deployment is set to False.
     """
     if system_class == "A":
         must_items = assessment.get("recommendations", {}).get("must", [])
         if len(must_items) == 0:
-            # 新格式字段
+            # new schema field
             assessment["overall_compliance"] = "COMPLIANT"
-            # 旧格式兼容
+            # legacy field compatibility
             assessment["overall_compliance_status"] = "Compliant"
 
             if not assessment.get("key_gaps") and not assessment.get("compliance_gaps"):
@@ -641,7 +641,7 @@ def build_training_sample(system_description: str, assessment: dict) -> dict:
     """
     import json as _json
 
-    # 构建标准输出 JSON（去掉 agent 内部字段）
+    # Build canonical output JSON (strips agent-internal fields)
     output = {
         "expert":      "governance_compliance",
         "agent_id":    assessment.get("agent_id", ""),
@@ -713,7 +713,7 @@ def build_training_sample(system_description: str, assessment: dict) -> dict:
 
 
 def _normalize_status(status: str) -> str:
-    """旧格式 → 新格式 enum 转换"""
+    """Convert legacy status string to canonical enum value."""
     mapping = {
         "Compliant":     "COMPLIANT",
         "Conditional":   "CONDITIONAL",
