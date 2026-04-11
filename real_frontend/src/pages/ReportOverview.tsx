@@ -16,9 +16,28 @@ interface Props {
   eval: DetailedEvaluation
   currentStep: ReportStep
   onStep: (step: ReportStep) => void
-  /** 来自后端的 Expert 1 报告（可选） */
+  /** Expert 1 report from the backend (optional, only present after a live submission) */
   expert1Report?: Record<string, any>
   onViewFull?: () => void
+}
+
+const LIVE_ATTACK_ERROR_MESSAGES: Record<string, { title: string; detail: string }> = {
+  unreachable: {
+    title: 'Project not running',
+    detail: 'The target URL was unreachable. Start the project server and re-submit to enable live attack testing.',
+  },
+  server_error: {
+    title: 'Target server error (HTTP 5xx)',
+    detail: 'The target is running but returning server errors. Check the project\'s API key or service configuration.',
+  },
+  auth_error: {
+    title: 'Invalid or missing API key',
+    detail: 'The target returned HTTP 401/403. Verify the project\'s API key is correctly configured and restart the server.',
+  },
+  unknown: {
+    title: 'Live attack could not proceed',
+    detail: 'An unexpected error occurred before the live attack began. The evaluation fell back to document analysis.',
+  },
 }
 
 const recMap = (r: string) => (r === 'PASS' || r === 'APPROVE' ? 'APPROVE' : r === 'FAIL' || r === 'REJECT' ? 'REJECT' : 'REVIEW')
@@ -46,40 +65,78 @@ const ReportOverview: FC<Props> = ({ eval: ev, currentStep, onStep, expert1Repor
         )}
       </div>
 
-      {/* Expert 1 live attack API results (only shown when submitted via New Evaluation) */}
-      {expert1Report && (
-        <div className="card p-6 border-2 border-apple-blue/20 bg-apple-blue-light/30">
-          <p className="section-label">Expert 1 Live Attack Results (API)</p>
-          <div className="flex flex-wrap items-center gap-3 mt-2">
-            {expert1Report.recommendation != null && (
-              <RecBadge rec={recMap(expert1Report.recommendation)} />
+      {/* Expert 1 live attack results (only shown after a live submission) */}
+      {expert1Report && (() => {
+        const errorCode = expert1Report.live_attack_error_code as string | undefined
+        const errorMsg  = expert1Report.live_attack_error  as string | undefined
+        const errInfo   = errorCode ? (LIVE_ATTACK_ERROR_MESSAGES[errorCode] ?? LIVE_ATTACK_ERROR_MESSAGES.unknown) : null
+        const isLive    = !errorCode && expert1Report.analysis_mode === 'live_attack'
+
+        return (
+          <div className="space-y-3">
+            {/* ── Error banner (scenario A / B) ───────────────────────── */}
+            {errInfo && (
+              <div className="card p-4 border-2 border-apple-red/30 bg-red-50">
+                <div className="flex items-start gap-3">
+                  <span className="text-apple-red text-lg leading-none mt-0.5">⚠</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-apple-red">{errInfo.title}</p>
+                    <p className="text-xs text-apple-gray-600 mt-0.5">{errInfo.detail}</p>
+                    {errorMsg && (
+                      <details className="mt-2">
+                        <summary className="text-[11px] text-apple-gray-400 cursor-pointer select-none">
+                          Technical details
+                        </summary>
+                        <p className="text-[11px] text-apple-gray-500 mt-1 font-mono break-all">
+                          {errorMsg.slice(0, 300)}{errorMsg.length > 300 ? '…' : ''}
+                        </p>
+                      </details>
+                    )}
+                    <p className="text-[11px] text-apple-gray-400 mt-2 italic">
+                      Live attack was skipped — results below are from document analysis.
+                    </p>
+                  </div>
+                </div>
+              </div>
             )}
-            {expert1Report.risk_tier != null && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-apple-gray-100 text-apple-gray-700">
-                Risk: {expert1Report.risk_tier}
-              </span>
-            )}
-            {expert1Report.session_id != null && (
-              <span className="text-[11px] text-apple-gray-400">Session: {String(expert1Report.session_id).slice(0, 20)}…</span>
-            )}
+
+            {/* ── Normal results card ──────────────────────────────────── */}
+            <div className={`card p-6 border-2 ${isLive ? 'border-apple-blue/20 bg-apple-blue-light/30' : 'border-apple-gray-100'}`}>
+              <p className="section-label">
+                Expert 1 {isLive ? 'Live Attack Results (API)' : 'Security Assessment (API)'}
+              </p>
+              <div className="flex flex-wrap items-center gap-3 mt-2">
+                {expert1Report.recommendation != null && (
+                  <RecBadge rec={recMap(expert1Report.recommendation)} />
+                )}
+                {expert1Report.risk_tier != null && (
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-apple-gray-100 text-apple-gray-700">
+                    Risk: {expert1Report.risk_tier}
+                  </span>
+                )}
+                {expert1Report.session_id != null && (
+                  <span className="text-[11px] text-apple-gray-400">Session: {String(expert1Report.session_id).slice(0, 20)}…</span>
+                )}
+              </div>
+              {isLive && Array.isArray(expert1Report.test_coverage?.attack_techniques_tested) && expert1Report.test_coverage!.attack_techniques_tested!.length > 0 && (
+                <p className="text-xs text-apple-gray-600 mt-3">
+                  Attack techniques tested: {expert1Report.test_coverage!.attack_techniques_tested!.length}
+                </p>
+              )}
+              {Array.isArray(expert1Report.key_findings) && expert1Report.key_findings!.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {expert1Report.key_findings!.slice(0, 5).map((f: unknown, i: number) => (
+                    <li key={i} className="text-xs text-apple-gray-700 flex gap-2">
+                      <span className="text-apple-red shrink-0">•</span>
+                      <span>{String(f)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
-          {Array.isArray(expert1Report.test_coverage?.attack_techniques_tested) && expert1Report.test_coverage!.attack_techniques_tested!.length > 0 && (
-            <p className="text-xs text-apple-gray-600 mt-3">
-              Attack techniques tested: {expert1Report.test_coverage!.attack_techniques_tested!.length}
-            </p>
-          )}
-          {Array.isArray(expert1Report.key_findings) && expert1Report.key_findings!.length > 0 && (
-            <ul className="mt-3 space-y-1.5">
-              {expert1Report.key_findings!.slice(0, 5).map((f, i) => (
-                <li key={i} className="text-xs text-apple-gray-700 flex gap-2">
-                  <span className="text-apple-red shrink-0">•</span>
-                  <span>{String(f)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+        )
+      })()}
 
       {/* Summary card */}
       <div className="card p-6">

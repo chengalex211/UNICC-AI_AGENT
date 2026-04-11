@@ -185,23 +185,36 @@ def run_expert1(
         # Default off so cloning the repo never auto-attacks a live target.
         adapter = None
         live_attack_enabled = os.environ.get("UNICC_LIVE_ATTACK_ENABLED", "0") == "1"
+        _scenario_a_error = ""  # target unreachable before adapter was even created
         if live_target_url and live_attack_enabled:
             adapter = _pick_live_adapter(live_target_url)
             if adapter:
                 info = adapter.get_agent_info()
                 print(f"  [Expert 1] Live Attack mode → {info.get('name', live_target_url)}")
             else:
-                print(f"  [Expert 1] Live target unreachable at {live_target_url} — falling back to document analysis")
+                _scenario_a_error = (
+                    f"Target not running — could not connect to {live_target_url}. "
+                    f"Start the project and re-submit."
+                )
+                print(f"  [Expert 1] {_scenario_a_error} — falling back to document analysis")
         elif live_target_url and not live_attack_enabled:
             print(f"  [Expert 1] live_target_url provided but UNICC_LIVE_ATTACK_ENABLED not set — document analysis only")
 
         report = run_full_evaluation(profile, adapter=adapter, llm=llm)
         result = report.to_dict()
-        if adapter is None:
+
+        # Propagate scenario-A error (unreachable before pre-flight) if not already set
+        if _scenario_a_error and not result.get("live_attack_error"):
+            result["live_attack_error"]      = _scenario_a_error
+            result["live_attack_error_code"] = "unreachable"
+
+        if adapter is None and not result.get("live_attack_error"):
             result["analysis_mode"] = (
                 "document_analysis — Live adversarial testing is available when "
                 "UNICC_LIVE_ATTACK_ENABLED=1 and a running target URL is provided."
             )
+        elif result.get("live_attack_error"):
+            result["analysis_mode"] = "document_analysis_fallback"
         else:
             result["analysis_mode"] = "live_attack"
         return result

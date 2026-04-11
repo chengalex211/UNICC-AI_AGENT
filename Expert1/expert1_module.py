@@ -32,7 +32,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Any
 
-from adapters.base_adapter import TargetAgentAdapter
+from adapters.base_adapter import TargetAgentAdapter, AdapterUnavailableError, AdapterTimeoutError, LiveAttackError
 from expert1_router import (
     AgentProfile,
     EvaluationSession,
@@ -145,6 +145,10 @@ class Expert1Report:
     breach_details:   list = field(default_factory=list)   # LLM-structured breach records
     phase_highlights: dict = field(default_factory=dict)   # probe/boundary/attack summary text
     fingerprint:      dict = field(default_factory=dict)   # Phase 0 TargetProfile
+
+    # Live attack connectivity diagnostics — non-empty when attack was aborted
+    live_attack_error:      str = ""  # human-readable reason shown in the UI
+    live_attack_error_code: str = ""  # "unreachable" | "server_error" | "auth_error"
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -472,6 +476,9 @@ def run_full_evaluation(
     print(f"Session: {session_id}")
     print(f"{'='*60}")
 
+    live_attack_error      = ""
+    live_attack_error_code = ""
+
     # ── Document analysis mode (adapter=None) ─────────────────────────────
     if adapter is None:
         print("  [Mode: DOCUMENT ANALYSIS — no live adapter]")
@@ -490,28 +497,72 @@ def run_full_evaluation(
 
     # ── Live attack mode ────────────────────────────────────────────────────
     else:
-        session = EvaluationSession(session_id=session_id, agent_id=profile.agent_id)
+        try:
+            # ── Pre-flight smoke test ──────────────────────────────────────
+            # Send a single benign probe to verify the target endpoint is
+            # actually processing requests before committing to a full attack.
+            print("  [Pre-flight] Smoke-testing target endpoint…")
+            try:
+                _smoke = adapter.send_message('{"ping": true}')
+                adapter.reset_session()
+                _err_prefix = ("[ERROR:", "[ADAPTER_ERROR:", "ERROR:")
+                if any(_smoke.startswith(p) for p in _err_prefix) or "[ADAPTER_ERROR:" in _smoke:
+                    _code = "server_error"
+                    if any(t in _smoke for t in ("401", "403", "Unauthorized", "Forbidden")):
+                        _code = "auth_error"
+                    raise LiveAttackError(
+                        f"Target is running but returned a server error: {_smoke[:200].strip()}. "
+                        f"Check the project's API key or server configuration.",
+                        code=_code,
+                    )
+                print("  [Pre-flight] OK — target is responsive.")
+            except (AdapterUnavailableError, AdapterTimeoutError) as _e:
+                raise LiveAttackError(
+                    f"Target became unreachable during pre-flight check ({_e}). "
+                    f"Ensure the project is running and accessible.",
+                    code="unreachable",
+                )
 
-        # Phase 0: FINGERPRINT — auto-detect target characteristics
-        router.run_fingerprint(adapter, session)
+            session = EvaluationSession(session_id=session_id, agent_id=profile.agent_id)
 
-        # Phase 1 + 2 + 3 (Phase 3 adapts using session.target_profile)
-        router.run_probe(profile, adapter, session)
-        router.run_boundary(profile, adapter, session)
-        router.run_attack(profile, adapter, session)
+            # Phase 0: FINGERPRINT — auto-detect target characteristics
+            router.run_fingerprint(adapter, session)
 
-        # Phase B: Standard Suite (Petri → transcript-based; others → single-turn)
-        suite_results = StandardSuiteResults()
-        if run_standard:
-            suite_label = "PETRI TRANSCRIPT SUITE" if _is_transcript_judge(adapter) else "STANDARD SUITE"
-            print(f"  [Phase B: {suite_label}]")
-            suite_results = run_standard_suite(adapter)
-            print(f"    B1={suite_results.B1_bias} B2={suite_results.B2_harmful} "
-                  f"B3={suite_results.B3_privacy} B4={suite_results.B4_transparency} "
-                  f"B5={suite_results.B5_un_specific}")
+            # Phase 1 + 2 + 3 (Phase 3 adapts using session.target_profile)
+            router.run_probe(profile, adapter, session)
+            router.run_boundary(profile, adapter, session)
+            router.run_attack(profile, adapter, session)
 
-        # SCORING
-        scoring_raw = router.run_scoring(profile, session)
+            # Phase B: Standard Suite (Petri → transcript-based; others → single-turn)
+            suite_results = StandardSuiteResults()
+            if run_standard:
+                suite_label = "PETRI TRANSCRIPT SUITE" if _is_transcript_judge(adapter) else "STANDARD SUITE"
+                print(f"  [Phase B: {suite_label}]")
+                suite_results = run_standard_suite(adapter)
+                print(f"    B1={suite_results.B1_bias} B2={suite_results.B2_harmful} "
+                      f"B3={suite_results.B3_privacy} B4={suite_results.B4_transparency} "
+                      f"B5={suite_results.B5_un_specific}")
+
+            # SCORING
+            scoring_raw = router.run_scoring(profile, session)
+
+        except LiveAttackError as _lae:
+            live_attack_error      = str(_lae)
+            live_attack_error_code = _lae.code
+            print(f"\n  [Live Attack ABORTED] {_lae}  (code={_lae.code})")
+            print("  [Falling back to document analysis]\n")
+
+            # Graceful degradation — produce a document-analysis report so
+            # the evaluation is not left empty-handed.
+            scoring_raw = router.run_doc_analysis_scoring(profile)
+            suite_results = StandardSuiteResults(
+                B1_bias="NOT_RUN", B2_harmful="NOT_RUN",
+                B3_privacy="NOT_RUN", B4_transparency="NOT_RUN",
+                B5_un_specific="NOT_RUN",
+            )
+            session = EvaluationSession(session_id=session_id, agent_id=profile.agent_id)
+            session.techniques_tested = []
+            adapter = None  # treat as document analysis for assembly below
 
     # ── Shared assembly (both modes) ──────────────────────────────────────
     # scoring_raw schema is identical in both modes — no changes needed below.
@@ -646,6 +697,8 @@ def run_full_evaluation(
             "boosted_tags":        session.target_profile.boosted_technique_tags(),
             "raw_notes":           session.target_profile.raw_notes,
         },
+        live_attack_error=live_attack_error,
+        live_attack_error_code=live_attack_error_code,
     )
 
     print(f"\n{'='*60}")

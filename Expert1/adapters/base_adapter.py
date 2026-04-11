@@ -1,9 +1,6 @@
 """
 adapters/base_adapter.py
 Expert 1 — TargetAgentAdapter Abstract Interface
-
-Expert 1 通过此接口与被测 Agent 交互，不关心 Agent 的具体类型
-（API / Web / File / Mock）。
 """
 
 from abc import ABC, abstractmethod
@@ -11,52 +8,57 @@ from abc import ABC, abstractmethod
 
 class TargetAgentAdapter(ABC):
     """
-    Expert 1 与被测 Agent 的统一接口。
-    所有具体 Adapter（API / Web / Mock）必须继承此类并实现全部方法。
+    Unified interface between Expert 1 and the system under test.
+    All concrete adapters (API / Web / Mock) must subclass this and implement every method.
     """
 
     @abstractmethod
     def send_message(self, message: str) -> str:
         """
-        向 Agent 发送一条消息，返回 Agent 的响应文本。
-
-        Args:
-            message: 发送给 Agent 的消息字符串
-
-        Returns:
-            Agent 的响应文本
+        Send a message to the target system and return its response text.
 
         Raises:
-            AdapterTimeoutError:  Agent 响应超时
-            AdapterUnavailableError: Agent 不可用
+            AdapterTimeoutError:     target did not respond within the timeout
+            AdapterUnavailableError: target service is unreachable
         """
 
     @abstractmethod
     def reset_session(self) -> None:
         """
-        重置会话状态，开始新的独立对话。
-        每条测试消息后必须调用，防止跨测试上下文污染。
+        Reset conversation state to begin a fresh independent turn.
+        Must be called after each test message to prevent cross-test context leakage.
         """
 
     @abstractmethod
     def get_agent_info(self) -> dict:
-        """
-        返回 Agent 的基本信息。
-
-        Returns:
-            dict with keys: name, type, description, version (optional)
-        """
+        """Return basic metadata about the target: name, type, description, version."""
 
     @abstractmethod
     def is_available(self) -> bool:
-        """
-        检查 Agent 当前是否可用（连接正常，服务运行中）。
-        """
+        """Return True if the target is reachable and its health check passes."""
 
 
 class AdapterTimeoutError(Exception):
-    """Agent 响应超时"""
+    """Target did not respond within the allowed timeout."""
 
 
 class AdapterUnavailableError(Exception):
-    """Agent 服务不可用"""
+    """Target service is unreachable."""
+
+
+class LiveAttackError(Exception):
+    """
+    Raised when a live attack cannot proceed due to a target configuration problem.
+
+    Attributes
+    ----------
+    code : str
+        Machine-readable error category:
+        - "unreachable"  — target refused connection or timed out on first contact
+        - "server_error" — target is running but returning HTTP 5xx
+        - "auth_error"   — target returned HTTP 401/403 (invalid/missing API key)
+    """
+
+    def __init__(self, message: str, code: str = "unknown"):
+        super().__init__(message)
+        self.code = code
