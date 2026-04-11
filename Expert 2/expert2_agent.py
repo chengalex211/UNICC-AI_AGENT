@@ -264,7 +264,13 @@ TOOLS = [
                         },
                         "note": {
                             "type": "string",
-                            "description": "Specific cross-expert notes, e.g., what Expert 1 or Expert 3 should investigate"
+                            "minLength": 20,
+                            "description": (
+                                "REQUIRED — must not be empty. "
+                                "Write 1-2 sentences directing Expert 1 and Expert 3 to specific findings they should cross-check. "
+                                "Example: 'Expert 1 should probe prompt injection via the unauthenticated file-upload pathway; "
+                                "Expert 3 should assess societal impact of the absence of human oversight on AI-generated classifications.'"
+                            )
                         }
                     },
                     "required": [
