@@ -14,6 +14,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 # Windows (default GBK) and other non-UTF-8 locales.
 export PYTHONIOENCODING=utf-8
 export PYTHONUTF8=1
+export ANONYMIZED_TELEMETRY=False
 
 # ── Step 1: Pre-download embedding model ─────────────────────────────────────
 echo "[start] Warming up sentence-transformers model cache…"
