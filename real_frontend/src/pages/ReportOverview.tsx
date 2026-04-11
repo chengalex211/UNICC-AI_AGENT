@@ -46,12 +46,6 @@ const LIVE_ATTACK_BANNERS: Record<string, {
     detail: 'The target rejected the request — invalid or missing API key.',
     action: 'Verify the project\'s API key is correctly set and restart the server.',
   },
-  disabled: {
-    type: 'warning',
-    title: 'Live attack testing is disabled on this server',
-    detail: 'A target URL was provided but the live attack feature is turned off.',
-    action: 'Set UNICC_LIVE_ATTACK_ENABLED=1 and restart the backend to enable it.',
-  },
   unknown: {
     type: 'error',
     title: 'Live attack could not proceed',

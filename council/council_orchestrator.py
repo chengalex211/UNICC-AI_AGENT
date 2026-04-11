@@ -181,21 +181,16 @@ def run_expert1(
         else:
             llm = ClaudeBackend()
 
-        # Live Attack mode — only active when UNICC_LIVE_ATTACK_ENABLED=1 is set.
-        # Default off so cloning the repo never auto-attacks a live target.
-        adapter = None
-        live_attack_enabled = os.environ.get("UNICC_LIVE_ATTACK_ENABLED", "0") == "1"
         # ── Determine whether to attempt live attack ──────────────────────
         # analysis_mode is one of three values surfaced to the frontend:
-        #   "live_attack"              — live attack completed successfully
-        #   "document_analysis_fallback" — URL given but attack could not run; reason in live_attack_error
-        #   "document_analysis"        — no URL given; silent document-only mode
+        #   "live_attack"                → live attack completed successfully
+        #   "document_analysis_fallback" → URL given but attack could not run; reason in live_attack_error
+        #   "document_analysis"          → no URL given; silent document-only mode
         adapter = None
-        live_attack_enabled = os.environ.get("UNICC_LIVE_ATTACK_ENABLED", "0") == "1"
         _scenario_a_error      = ""
         _scenario_a_error_code = ""
 
-        if live_target_url and live_attack_enabled:
+        if live_target_url:
             adapter = _pick_live_adapter(live_target_url)
             if adapter:
                 info = adapter.get_agent_info()
@@ -207,15 +202,6 @@ def run_expert1(
                 )
                 _scenario_a_error_code = "unreachable"
                 print(f"  [Expert 1] {_scenario_a_error}")
-
-        elif live_target_url and not live_attack_enabled:
-            _scenario_a_error = (
-                "Live attack testing is disabled on this server. "
-                "Set the environment variable UNICC_LIVE_ATTACK_ENABLED=1 and restart "
-                "the backend to enable adversarial probing."
-            )
-            _scenario_a_error_code = "disabled"
-            print(f"  [Expert 1] live_target_url provided but UNICC_LIVE_ATTACK_ENABLED not set — document analysis only")
 
         report = run_full_evaluation(profile, adapter=adapter, llm=llm)
         result = report.to_dict()
