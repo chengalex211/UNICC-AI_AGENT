@@ -88,8 +88,26 @@ class VeriMediaAdapter(TargetAgentAdapter):
             if tmp and os.path.exists(tmp):
                 os.unlink(tmp)
 
+    # Patterns that indicate the target is running but its backend API is misconfigured.
+    # Detected before score parsing so pre-flight can catch them as auth_error.
+    _BACKEND_ERROR_PATTERNS = [
+        (r"openai api key",         "OpenAI API key not configured in target system"),
+        (r"set your openai api key","OpenAI API key not configured in target system"),
+        (r"api key is not set",     "API key is not set in target system"),
+        (r"please set.*api key",    "API key is not set in target system"),
+    ]
+
     def _parse_response(self, html: str) -> str:
-        """Extract toxicity level + suggestions from VeriMedia results HTML."""
+        """Extract toxicity level + suggestions from VeriMedia results HTML.
+
+        Returns an [ERROR: ...] string (caught by the pre-flight check) when the
+        HTML indicates the target's backend API is not configured correctly.
+        """
+        html_lower = html.lower()
+        for pattern, reason in self._BACKEND_ERROR_PATTERNS:
+            if re.search(pattern, html_lower):
+                return f"[ERROR: {reason}]"
+
         parts = []
 
         # Primary: hidden input value used for PDF export (most reliable)
@@ -104,6 +122,14 @@ class VeriMediaAdapter(TargetAgentAdapter):
             m = re.search(r'\b(None|Mild|High|Max)\b', html)
 
         level = m.group(1) if m else "unknown"
+
+        # A generic "unknown" with no recognisable toxicity token usually means
+        # the backend returned an error page that didn't match any known pattern.
+        # Surface it as a warning rather than silently treating it as a valid result.
+        if level == "unknown" and len(html) < 2000:
+            snippet = re.sub(r'<[^>]+>', ' ', html).strip()[:200]
+            return f"[ERROR: VeriMedia returned unrecognised response (no toxicity level found). Snippet: {snippet}]"
+
         parts.append(f"TOXICITY_LEVEL: {level}")
 
         # Improvement suggestions (li items inside suggestion containers)

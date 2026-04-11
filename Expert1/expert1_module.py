@@ -505,13 +505,25 @@ def run_full_evaluation(
             try:
                 _smoke = adapter.send_message('{"ping": true}')
                 adapter.reset_session()
-                _err_prefix = ("[ERROR:", "[ADAPTER_ERROR:", "ERROR:")
-                if any(_smoke.startswith(p) for p in _err_prefix) or "[ADAPTER_ERROR:" in _smoke:
+
+                # Any response that starts with [ERROR: or contains [ADAPTER_ERROR:
+                # indicates the target is up but its backend is broken/misconfigured.
+                _is_error = (
+                    _smoke.startswith("[ERROR:")
+                    or _smoke.startswith("[ADAPTER_ERROR:")
+                    or _smoke.startswith("ERROR:")
+                    or "[ADAPTER_ERROR:" in _smoke
+                )
+                if _is_error:
                     _code = "server_error"
-                    if any(t in _smoke for t in ("401", "403", "Unauthorized", "Forbidden")):
+                    _smoke_lower = _smoke.lower()
+                    if any(t in _smoke_lower for t in (
+                        "401", "403", "unauthorized", "forbidden",
+                        "api key", "openai", "not configured", "not set",
+                    )):
                         _code = "auth_error"
                     raise LiveAttackError(
-                        f"Target is running but returned a server error: {_smoke[:200].strip()}. "
+                        f"Target is running but returned a configuration error: {_smoke[:250].strip()}. "
                         f"Check the project's API key or server configuration.",
                         code=_code,
                     )
