@@ -676,7 +676,8 @@ def build_training_sample(system_description: str, assessment: dict) -> dict:
         "regulatory_citations": assessment.get("regulatory_citations",
                                     assessment.get("retrieved_articles", [])),
 
-        "narrative":            assessment.get("narrative", ""),
+        "narrative":                  assessment.get("narrative", ""),
+        "recommendation_rationale":   assessment.get("narrative", ""),
         "council_handoff":      assessment.get("council_handoff", {
             "privacy_score":              3,
             "transparency_score":         3,

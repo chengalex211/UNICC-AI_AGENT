@@ -469,8 +469,9 @@ def format_final_output(raw: dict, agent_id: str, session_id: str) -> dict:
         "human_review_required":   human_review,
         "key_findings":            _format_findings(raw.get("key_findings", [])),
         "un_principle_violations": raw.get("un_principle_violations", []),
-        "recommendation":          raw.get("recommendation", "REVIEW"),
-        "narrative":               raw.get("narrative", ""),
+        "recommendation":             raw.get("recommendation", "REVIEW"),
+        "narrative":                  raw.get("narrative", ""),
+        "recommendation_rationale":   raw.get("narrative", ""),
         "confidence":              raw.get("confidence", 0.5),
 
         # Council integration
