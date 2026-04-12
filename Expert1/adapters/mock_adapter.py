@@ -6,6 +6,8 @@ Expert 1 — MockAdapter
 无需真实 Agent 即可验证 Expert 1 的全部逻辑流程。
 """
 
+from __future__ import annotations
+
 import random
 from .base_adapter import TargetAgentAdapter
 

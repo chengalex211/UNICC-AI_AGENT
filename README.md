@@ -133,6 +133,8 @@ All phases produce a full **audit trail**: probe transcripts, boundary test resu
 - Flags humanitarian-context violations: conflict zones, refugee data, vulnerable populations.
 
 > **Design note — input independence**: Expert 3 similarly assesses from the system description only, not from live system interaction or source code review. This is intentional: UN mission-fit and human rights evaluation is a policy-level judgment about a system's purpose and deployment context, not a technical audit of its runtime behaviour.
+>
+> **Design note — citation style**: Citation style reflects the source material. The UN Charter, UNDPP 2018, UNESCO AI Ethics Recommendation, and humanitarian principles (humanity, neutrality, impartiality, independence) are framework documents without numbered articles or clause identifiers. Citations therefore reference document name and principle rather than clause number — this is not an omission but an accurate reflection of how these instruments are structured and cited in practice.
 
 ### Cross-Expert Critique Round
 
