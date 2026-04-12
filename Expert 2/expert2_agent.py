@@ -582,6 +582,7 @@ class Expert2Agent:
                 if not normalized:
                     normalized = list(final_assessment.get("retrieved_articles", []))
                 final_assessment["regulatory_citations"] = normalized
+                final_assessment.setdefault("recommendation_rationale", final_assessment.get("narrative", ""))
                 return final_assessment
 
         raise ValueError(f"Exceeded max search rounds ({MAX_SEARCH_ROUNDS}) without produce_assessment.")
