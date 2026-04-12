@@ -627,6 +627,7 @@ def apply_label_override(assessment: dict, system_class: str) -> dict:
             handoff = assessment.setdefault("council_handoff", {})
             handoff["compliance_blocks_deployment"] = False
 
+    assessment.setdefault("recommendation_rationale", assessment.get("narrative", ""))
     return assessment
 
 
