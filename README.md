@@ -236,7 +236,7 @@ We additionally added a `/v1/judge/evaluate-transcript` endpoint that accepts mu
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/JACKYYISHERE/UNICC-Project-2.git
+git clone https://github.com/chengalex211/UNICC-AI_AGENT.git
 cd UNICC-Project-2
 pip install -r requirements.txt
 
